@@ -35,7 +35,6 @@ gulp.task('lint-src', () =>
 
 gulp.task('watch', () => {
   gulp.watch(config.paths.js.src, ['babel-src']);
-  gulp.watch(config.paths.test.src, ['babel-test']);
 });
 
 gulp.task('default', () =>
