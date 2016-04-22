@@ -1,6 +1,6 @@
-/*eslint no-console: ["error", { allow: ["log"] }] */
+/*eslint no-console: ["error", { allow: ["log", "dir"] }] */
 
-import MongoClient from 'mongodb';
+import { MongoClient } from 'mongodb';
 import assert from 'assert';
 
 // Connection URL
