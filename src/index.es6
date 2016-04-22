@@ -1,12 +1,14 @@
+/*eslint no-console: ["error", { allow: ["log"] }] */
 // import request from 'request-promise';
 import Bot from 'slackbots';
+import { YisDB } from './db_connector';
 
 function find(arr, params) {
   var result = {};
 
   arr.forEach(function(item) {
     if (Object.keys(params).every(function(key) { return item[key] === params[key];})) {
-        result = item;
+      result = item;
     }
   });
 
@@ -15,10 +17,9 @@ function find(arr, params) {
 
 export default class Yis extends Bot {
   constructor(settings) {
-    // request(foo)
-    // .then(() => {})
-    // .catch(() => {});
     super(settings);
+
+    this.DBConnection = new YisDB();
   }
 
   _getUserById (id) {
@@ -45,7 +46,7 @@ export default class Yis extends Bot {
   }
 
   _isChannelMessage (message) {
-    console.log("channel type: ", message.channel[0]);
+    console.log('channel type: ', message.channel[0]);
     return typeof message.channel === 'string' &&
                   message.channel[0] === 'C';
   }
@@ -59,8 +60,17 @@ export default class Yis extends Bot {
 
   _username (channel, slackUsername, ghUsername) {
     let message = `Okay ${slackUsername }, setting ${ghUsername} as your GH username.`;
-    this.postMessage(channel, message, { as_user: true });
     // add repo to db?
+    let pM = this.postMessage;
+
+    this.DBConnection.insertUser(
+      {
+        gh_username: ghUsername,
+        slack_username: slackUsername,
+        pull_requests: []
+      }, () => {
+        pM(channel, message, { as_user: true });
+      });
   }
 
   _addRepo (channel, repo) {
@@ -97,41 +107,41 @@ export default class Yis extends Bot {
   }
 
   _help (channel) {
-    let message = "```let me know what your GH username is: username <github username>\n" +
-    "add a repo to watch for PR's and comments: add <repo name>\n" +
-    "remove a repo you've previously added: remove <repo name\n" +
-    "clear all repo's: clear```\n";
+    let message = '```let me know what your GH username is: username <github username>\n' +
+    'add a repo to watch for PR\'s and comments: add <repo name>\n' +
+    'remove a repo you\'ve previously added: remove <repo name\n' +
+    'clear all repo\'s: clear```\n';
     this.postMessage(channel, message, { as_user: true });
   }
 
   async _reply (originalMessage) {
     // index 0 should be yisbot, 1 command type?, 2 command parameter?
-    let message = originalMessage.text.replace(/^yisbot /, '').split(" ");
+    let message = originalMessage.text.replace(/^yisbot /, '').split(' ');
     switch (message[0]) {
-      case "username":
-        console.log("username");
+      case 'username':
+        console.log('username');
         let user = await this._getUserById(originalMessage.user);
         this._username(originalMessage.channel, user.name, message[1]);
         break;
-      case "add":
+      case 'add':
         this._addRepo(originalMessage.channel, message[1]);
         break;
-      case "remove":
+      case 'remove':
         this._removeRepo(originalMessage.channel, message[1]);
         break;
-      case "clear":
+      case 'clear':
         this._clear(originalMessage.channel);
         break;
-      case "pr":
+      case 'pr':
         this._pr(originalMessage.channel, message[1]);
         break;
-      case "comment":
+      case 'comment':
         this._comment(originalMessage.channel, message[1]);
         break;
-      case "help":
+      case 'help':
         this._help(originalMessage.channel);
         break;
-      case "breadcrumbs":
+      case 'breadcrumbs':
         this._meme(originalMessage.channel);
         break;
       default:
@@ -143,7 +153,7 @@ export default class Yis extends Bot {
 }
 
 let settings = {
-  token: 'insertTokenHere'
+  token: 'foo'
 , name: 'yisbot'
 };
 let yisbot = new Yis(settings);
