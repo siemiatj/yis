@@ -1,0 +1,18 @@
+{
+    "username": "test1",
+    "settings": {
+        "repositories": ["atom/electron"],
+        "interval": "8h"
+    },
+    "pull_requests": ["atom/electron/pull/101"],
+    "comments": ["atom/electron/pull/101/#issuecomment-207651966"]
+}
+{
+    "username": "test2",
+    "settings": {
+        "repositories": ["facebook/react"],
+        "interval": "8h"
+    },
+    "pull_requests": ["facebook/react/pull/14"],
+    "comments": ["facebook/react/pull/14/#issuecomment-207651234"]
+}

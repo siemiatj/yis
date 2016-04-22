@@ -1,14 +1,14 @@
 /*eslint no-console: ["error", { allow: ["log"] }] */
 
-var MongoClient = require('mongodb').MongoClient
-  , assert = require('assert');
+import MongoClient from 'mongodb';
+import assert from 'assert';
 
 // Connection URL
-var url = 'mongodb://localhost:27017/yis';
-// Use connect method to connect to the Server
+let url = 'mongodb://localhost:27017/yis';
+
 MongoClient.connect(url, function(err, db) {
   assert.equal(null, err);
-  console.log('Connected correctly to server');
+  console.log('Testing db connection');
 
   db.close();
 });
