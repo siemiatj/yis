@@ -10,6 +10,10 @@ var config = {
     js: {
       src: 'src/**/*.es6',
       dist: 'dist/'
+    },
+    test: {
+      src: 'src/**/*.es6',
+      dist: 'test-dist'
     }
   }
 };
@@ -22,12 +26,18 @@ gulp.task('clean', () =>
   del(config.paths.js.dist)
 );
 
-gulp.task('babel', ['babel-src']);
+gulp.task('babel', ['babel-src', 'babel-test']);
 
 gulp.task('babel-src', ['lint-src'], () =>
   gulp.src(config.paths.js.src)
     .pipe(babel())
     .pipe(gulp.dest(config.paths.js.dist))
+);
+
+gulp.task('babel-test', () =>
+  gulp.src(config.paths.test.src)
+    .pipe(babel())
+    .pipe(gulp.dest(config.paths.test.dist))
 );
 
 gulp.task('lint-src', () =>
