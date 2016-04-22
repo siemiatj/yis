@@ -49,7 +49,7 @@ let yisbot = new Yis(settings);
 // let channels = await yisbot.getChannels();
 // let channelID =
 //
-yisbot.on('start', () => {
+yisbot.on('start', params => {
   yisbot.postMessageToChannel('yis', 'aww yis', params);
 });
 

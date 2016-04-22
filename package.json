@@ -19,7 +19,7 @@
     "slackbots": "^0.5.1",
     "hapi": "13.3.0",
     "hapi-routes": "2.1.2",
-    "mongodb": "^2.1.16",
+    "mongodb": "2.1.16",
     "request-promise": "3.0.0"
   },
   "devDependencies": {
