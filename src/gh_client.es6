@@ -7,6 +7,8 @@ export class YisGH {
     this.client = new github({ version: '3.0.0' });
   }
 
+  // this function should return data from the callback so we can access
+  // the data in the cron script
   getAll() {
     this.client.pullRequests.getAll({ user: 'saucelabs', repo: 'yis' }, function(err, data) {
       if (err) { throw err; }
@@ -39,8 +41,6 @@ export class YisGH {
           events = event;
         }
       });
-      console.log(events);
-      console.log('*********************');
-    });
+    }
   }
 }
