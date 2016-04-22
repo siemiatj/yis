@@ -15,12 +15,12 @@
   },
   "dependencies": {
     "bluebird": "3.3.5",
-    "request-promise": "3.0.0",
-    "slackbots": "^0.5.1",
+    "github": "^0.2.4",
     "hapi": "13.3.0",
     "hapi-routes": "2.1.2",
     "mongodb": "2.1.16",
-    "request-promise": "3.0.0"
+    "request-promise": "3.0.0",
+    "slackbots": "^0.5.1"
   },
   "devDependencies": {
     "babel": "6.5.2",
@@ -33,13 +33,14 @@
     "del": "2.2.0",
     "eslint": "2.8.0",
     "eslint-config-standard": "5.1.0",
+    "eslint-plugin-promise": "^1.1.0",
     "eslint-plugin-standard": "1.3.2",
     "gulp": "3.9.1",
     "gulp-babel": "6.1.2",
     "gulp-eslint": "2.0.0",
     "gulp-mocha": "2.2.0",
+    "gulp-nodemon": "2.0.6",
     "mocha": "2.4.5",
-    "run-sequence": "1.1.5",
-    "gulp-nodemon": "2.0.6"
+    "run-sequence": "1.1.5"
   }
 }
