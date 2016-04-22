@@ -57,22 +57,34 @@ export default class Yis extends Bot {
     }
   }
 
-  _username (channel, slackUsername, ghUsername) {;
+  _username (channel, slackUsername, ghUsername) {
     let message = `Okay ${slackUsername }, setting ${ghUsername} as your GH username.`;
     this.postMessage(channel, message, { as_user: true });
     // add repo to db?
   }
 
-  _addRepo (channel, repo) {;
+  _addRepo (channel, repo) {
     let message = `Okay, adding ${repo} to your reminders.`;
     this.postMessage(channel, message, { as_user: true });
     // add repo to db?
   }
 
-  _removeRepo (channel, repo) {;
+  _removeRepo (channel, repo) {
     let message = `Okay, removing ${repo} from your reminders.`;
     this.postMessage(channel, message, { as_user: true });
     // remove repo from db?
+  }
+
+  _pr (channel, hour) {
+    let message = `Okay, I'll ping you about new pull requests every ${hour} hours.`;
+    this.postMessage(channel, message, { as_user: true });
+    // update interval and reset desired ping in db?
+  }
+
+  _comment (channel, hour) {
+    let message = `Okay, I'll ping you about new comments every ${hour} hours.`;
+    this.postMessage(channel, message, { as_user: true });
+    // update interval and reset desired ping in db?
   }
 
   _clear (channel) {
@@ -86,7 +98,6 @@ export default class Yis extends Bot {
 
   async _reply (originalMessage) {
     // index 0 should be yisbot, 1 command type?, 2 command parameter?
-
     let message = originalMessage.text.replace(/^yisbot /, '').split(" ");
     switch (message[0]) {
       case "username":
@@ -102,6 +113,12 @@ export default class Yis extends Bot {
         break;
       case "clear":
         this._clear(originalMessage.channel);
+        break;
+      case "pr":
+        this._pr(originalMessage.channel, message[1]);
+        break;
+      case "comment":
+        this._comment(originalMessage.channel, message[1]);
         break;
       case "breadcrumbs":
         this._meme(originalMessage.channel);
