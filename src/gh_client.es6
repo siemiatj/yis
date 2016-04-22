@@ -3,3 +3,7 @@
 import github from 'github';
 
 console.log('GITHUB: ', github);
+
+export class YisGH {
+    
+}
