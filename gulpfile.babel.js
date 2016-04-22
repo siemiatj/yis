@@ -37,6 +37,12 @@ gulp.task('lint-src', () =>
     .pipe(gulpEslint.failAfterError())
 );
 
+gulp.task('build', () => {
+  gulp.src(config.paths.js.src)
+    .pipe(babel())
+    .pipe(gulp.dest(config.paths.js.dist));
+});
+
 gulp.task('watch', () => {
   gulp.watch(config.paths.js.src, ['babel-src']);
 });
