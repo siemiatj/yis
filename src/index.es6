@@ -96,6 +96,14 @@ export default class Yis extends Bot {
     this.postMessage(channel, 'Awww yiss, mf\'ing breadcrumbs!', { as_user: true });
   }
 
+  _help (channel) {
+    let message = "```let me know what your GH username is: username <github username>\n" +
+    "add a repo to watch for PR's and comments: add <repo name>\n" +
+    "remove a repo you've previously added: remove <repo name\n" +
+    "clear all repo's: clear```\n";
+    this.postMessage(channel, message, { as_user: true });
+  }
+
   async _reply (originalMessage) {
     // index 0 should be yisbot, 1 command type?, 2 command parameter?
     let message = originalMessage.text.replace(/^yisbot /, '').split(" ");
@@ -120,6 +128,9 @@ export default class Yis extends Bot {
       case "comment":
         this._comment(originalMessage.channel, message[1]);
         break;
+      case "help":
+        this._help(originalMessage.channel);
+        break;
       case "breadcrumbs":
         this._meme(originalMessage.channel);
         break;
@@ -132,7 +143,7 @@ export default class Yis extends Bot {
 }
 
 let settings = {
-  token: 'xoxb-36814391072-YHfA2q3TP9OaiZzIgJebOwAw'
+  token: 'insertTokenHere'
 , name: 'yisbot'
 };
 let yisbot = new Yis(settings);
