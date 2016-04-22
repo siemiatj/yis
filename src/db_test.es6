@@ -7,7 +7,11 @@ console.log('Test connection: ');
 newDBConn.testConnection();
 
 console.log('Find user: ');
-newDBConn.findUser('test1');
+newDBConn.findUser('test1', u => {
+  console.log('ARGS: ', u[0]);
+});
 
 console.log('Fail finding user: ');
-newDBConn.findUser('fakeuser');
+newDBConn.findUser('fakeuser', u => {
+  console.log('Fail: ', u);
+});

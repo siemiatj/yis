@@ -4,55 +4,95 @@ import { MongoClient } from 'mongodb';
 import assert from 'assert';
 
 export class YisDB {
-  constructor(url) {
+  constructor(url, table) {
 
     // Connection URL
     this.dbUrl = url || 'mongodb://localhost:27017/yis';
+    this.dbTable = table || 'users';
   }
 
   testConnection() {
-    const url = this.dbUrl; 
-    MongoClient.connect(url, function(err, db) {
+    const URL = this.dbUrl; 
+    MongoClient.connect(URL, function(err, db) {
       assert.equal(null, err);
       console.log('Testing db connection');
-
       db.close();
     });
   }
 
-  findUser(username) {
-    const url = this.dbUrl;
-    const findUser = function(db, callback) {
-      let cursor = db.collection('users').find( { 'username': username } );
-      
-      cursor.each(function(err, doc) {
-        assert.equal(err, null);
-        if (doc != null) {
-          console.dir(doc);
-        } else {
-          callback();
-        }
+  findUser(username, callback) {
+    const URL = this.dbUrl;
+    const TABLE = this.dbTable;
+    const find = function(db) {
+      let cursor = db.collection(TABLE).find( { 'username': username } );
+
+      cursor.toArray(function(err, doc) {
+        assert.equal(null, err);
+        db.close();
+        callback(doc);
       });
     };
 
-    MongoClient.connect(url, function(err, db) {
+    MongoClient.connect(URL, function(err, db) {
       assert.equal(null, err);
-      findUser(db, function() {
+      find(db);
+    });
+  }
+
+  insertUser(username, data) {
+    const URL = this.dbUrl;
+    const TABLE = this.dbTable;
+
+    let insert = function(db, callback) {
+      db.collection(TABLE).insertOne(data, (err, result) => {
+        assert.equal(err, null);
+        // console.log("Inserted a document into the restaurants collection.");
+        callback(result);
+      });
+    };
+
+    MongoClient.connect(URL, function(err, db) {
+      assert.equal(null, err);
+      insert(db, function() {
         console.log('User not found');
         db.close();
       });
     });
   }
 
-  addUser() {
+  updateUser(username, data) {
+    const URL = this.dbUrl;
+    const TABLE = this.dbTable;
+    const update = (db, callback) => {
+      console.log(username, data, TABLE);
 
+      callback();
+    };
+
+    MongoClient.connect(URL, function(err, db) {
+      assert.equal(null, err);
+      update(db, function() {
+        console.log('User not found');
+        db.close();
+      });
+    });
   }
 
-  updateUser() {
+  removeUser(username) {
+    const URL = this.dbUrl;
+    const TABLE = this.dbTable;
+    const remove = function(db, callback) {
+      console.log(username, TABLE);
 
-  }
+      callback();
+    };
 
-  deleteUser() {
-
+    MongoClient.connect(URL, function(err, db) {
+      assert.equal(null, err);
+      remove(db, function() {
+        console.log('User deleted');
+        db.close();
+      });
+    });
   }
 }
