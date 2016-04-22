@@ -69,8 +69,8 @@ export default class Yis extends Bot {
         slack_username: slackUsername,
         pull_requests: []
       }, () => {
-        pM(channel, message, { as_user: true });
-      });
+      pM(channel, message, { as_user: true });
+    });
   }
 
   _addRepo (channel, repo) {
