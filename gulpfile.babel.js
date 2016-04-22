@@ -3,16 +3,20 @@ import babel from 'gulp-babel';
 import del from 'del';
 import runSequence from 'run-sequence';
 import gulpEslint from 'gulp-eslint';
-import mocha from 'gulp-mocha';
+import nodemon from 'gulp-nodemon';
 
 var config = {
   paths: {
     js: {
       src: 'src/**/*.es6',
       dist: 'dist/'
-    },
+    }
   }
 };
+
+gulp.task('server', () => {
+  nodemon({ script : './dist/server.js', ext : 'js' });
+});
 
 gulp.task('clean', () =>
   del(config.paths.js.dist)
@@ -38,5 +42,5 @@ gulp.task('watch', () => {
 });
 
 gulp.task('default', () =>
-  runSequence('clean', ['babel'])
+  runSequence('clean', ['babel'], 'server')
 );

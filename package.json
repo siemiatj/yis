@@ -16,7 +16,9 @@
   "dependencies": {
     "bluebird": "3.3.5",
     "request-promise": "3.0.0",
-    "slackbots": "^0.5.1"
+    "slackbots": "^0.5.1",
+    "hapi": "13.3.0",
+    "hapi-routes": "2.1.2"
   },
   "devDependencies": {
     "babel": "6.5.2",
@@ -35,6 +37,7 @@
     "gulp-eslint": "2.0.0",
     "gulp-mocha": "2.2.0",
     "mocha": "2.4.5",
-    "run-sequence": "1.1.5"
+    "run-sequence": "1.1.5",
+    "gulp-nodemon": "2.0.6"
   }
 }
