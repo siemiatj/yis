@@ -42,11 +42,9 @@ export class YisDB {
   insertUser(username, data) {
     const URL = this.dbUrl;
     const TABLE = this.dbTable;
-
-    let insert = function(db, callback) {
+    const insert = function(db, callback) {
       db.collection(TABLE).insertOne(data, (err, result) => {
         assert.equal(err, null);
-        // console.log("Inserted a document into the restaurants collection.");
         callback(result);
       });
     };
@@ -54,7 +52,6 @@ export class YisDB {
     MongoClient.connect(URL, function(err, db) {
       assert.equal(null, err);
       insert(db, function() {
-        console.log('User not found');
         db.close();
       });
     });
@@ -64,15 +61,20 @@ export class YisDB {
     const URL = this.dbUrl;
     const TABLE = this.dbTable;
     const update = (db, callback) => {
-      console.log(username, data, TABLE);
-
-      callback();
+      db.collection(TABLE).updateOne(
+        { username: username },
+        {
+          $set: data
+        }, (err, result) => {
+          assert.equal(err, null);
+          callback(result);
+        }
+      );
     };
 
     MongoClient.connect(URL, function(err, db) {
       assert.equal(null, err);
       update(db, function() {
-        console.log('User not found');
         db.close();
       });
     });
@@ -82,9 +84,12 @@ export class YisDB {
     const URL = this.dbUrl;
     const TABLE = this.dbTable;
     const remove = function(db, callback) {
-      console.log(username, TABLE);
-
-      callback();
+      db.collection(TABLE).deleteOne(
+        { username: username }, (err, result) => {
+          assert.equal(err, null);
+          callback(result);
+        }
+      );
     };
 
     MongoClient.connect(URL, function(err, db) {
