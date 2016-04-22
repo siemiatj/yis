@@ -1,20 +1,30 @@
 {
-    "username": "test1",
+    "gh_username": "test1",
+    "slack_username": "slacktest",
     "settings": {
         "repositories": ["atom/electron"],
-        "intervalPR": "24h",
-        "intervalCommit": "8h"
+        "interval_pr": "24h",
+        "interval_comment": "8h"
     },
+    "last_comment_ping": "123456789",
+    "desired_comment_ping": "123456789",
+    "last_pr_ping": "123456789",
+    "desired_pr_ing": "123456789",
     "pull_requests": ["atom/electron/pull/101"],
     "comments": ["atom/electron/pull/101/#issuecomment-207651966"]
 }
 {
-    "username": "test2",
+    "gh_username": "test2",
+    "slack_username": "slacktest2",
     "settings": {
         "repositories": ["facebook/react"],
-        "intervalPR": "24h",
-        "intervalCommit": "8h"
+        "interval_pr": "24h",
+        "interval_comment": "8h"
     },
+    "last_comment_ping": "123456789",
+    "desired_comment_ping": "123456789",
+    "last_pr_ping": "123456789",
+    "desired_pr_ing": "123456789",
     "pull_requests": ["facebook/react/pull/14"],
     "comments": ["facebook/react/pull/14/#issuecomment-207651234"]
 }
