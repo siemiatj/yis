@@ -1,3 +1,5 @@
+/*eslint no-console: ["error", { allow: ["log"] }] */
+
 import request from 'request-promise';
 
 export default class Yis {
@@ -6,7 +8,7 @@ export default class Yis {
     .then(() => {
       console.log('YES');
     })
-    .catch((err) => {
+    .catch(err => {
       console.log('ERR: ', err);
     });
   }
