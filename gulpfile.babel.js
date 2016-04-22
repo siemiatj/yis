@@ -42,5 +42,5 @@ gulp.task('watch', () => {
 });
 
 gulp.task('default', () =>
-  runSequence('clean', ['babel'], 'server')
+  runSequence('clean', ['babel']) //, 'server') // we're not using happy so don't run this
 );

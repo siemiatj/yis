@@ -33,4 +33,7 @@ pre-stop script
 end script
 ```
 
+# import dataset for MongoDB to test
+mongoimport --db yis --collection users --drop --file data/test_db.json 
+
 
