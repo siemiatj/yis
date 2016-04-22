@@ -24,7 +24,7 @@ export class YisDB {
     const URL = this.dbUrl;
     const TABLE = this.dbTable;
     const find = function(db) {
-      let cursor = db.collection(TABLE).find( { 'username': username } );
+      let cursor = db.collection(TABLE).find( { 'gh_username': username } );
 
       cursor.toArray(function(err, doc) {
         assert.equal(null, err);
@@ -39,7 +39,7 @@ export class YisDB {
     });
   }
 
-  insertUser(username, data) {
+  insertUser(data) {
     const URL = this.dbUrl;
     const TABLE = this.dbTable;
     const insert = function(db, callback) {
@@ -62,7 +62,7 @@ export class YisDB {
     const TABLE = this.dbTable;
     const update = (db, callback) => {
       db.collection(TABLE).updateOne(
-        { username: username },
+        { gh_username: username },
         {
           $set: data
         }, (err, result) => {
@@ -85,7 +85,7 @@ export class YisDB {
     const TABLE = this.dbTable;
     const remove = function(db, callback) {
       db.collection(TABLE).deleteOne(
-        { username: username }, (err, result) => {
+        { gh_username: username }, (err, result) => {
           assert.equal(err, null);
           callback(result);
         }
