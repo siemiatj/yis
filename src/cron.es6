@@ -9,9 +9,10 @@ import CronJob from 'cron';
 const DBConnect = new YisDB();
 const GHClient = new YisGH();
 
-console.log('APIS: ', DBConnect, GHClient);
 let job = new CronJob.CronJob('00 * * * * *', function () {
-  console.log(GHClient.getAll());
+  GHClient.getAll((ret) => {
+    console.log('DATA: ', ret);
+  });
 }, null, true, 'America/Los_Angeles');
 
 // export default class Yis {

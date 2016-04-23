@@ -9,14 +9,14 @@ export class YisGH {
 
   // this function should return data from the callback so we can access
   // the data in the cron script
-  getAll() {
+  getAll(callback) {
     this.client.pullRequests.getAll({ user: 'saucelabs', repo: 'yis' }, function(err, data) {
       if (err) { throw err; }
       console.log('*** Pull Requests ***');
       console.log(data);
       console.log('*********************');
 
-      return data;
+      callback(data);
     });
   }
 
