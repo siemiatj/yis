@@ -1,6 +1,7 @@
 // module responsible for connecting to github
 /*eslint no-console: ["error", { allow: ["log"] }] */
 import github from 'github';
+import Bluebird from 'bluebird';
 
 export class YisGH {
   constructor() {
@@ -9,14 +10,18 @@ export class YisGH {
 
   // this function should return data from the callback so we can access
   // the data in the cron script
-  getAll(callback) {
-    this.client.pullRequests.getAll({ user: 'saucelabs', repo: 'yis' }, function(err, data) {
-      if (err) { throw err; }
-      console.log('*** Pull Requests ***');
-      console.log(data);
-      console.log('*********************');
+  getAll(resolve, reject) {
+    const client = this.client;
 
-      callback(data);
+    return new Bluebird( () => {
+      client.pullRequests.getAll({ user: 'saucelabs', repo: 'yis' }, function(err, data) {
+        if (err) {
+          reject(err);
+        }
+        console.log('*** Pull Requests ***');
+
+        resolve(data);
+      });
     });
   }
 
