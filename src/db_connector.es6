@@ -39,10 +39,10 @@ export class YisDB {
     });
   }
 
-  insertUser(data) {
+  insertUser(data, callback) {
     const URL = this.dbUrl;
     const TABLE = this.dbTable;
-    const insert = function(db, callback) {
+    const insert = function(db) {
       db.collection(TABLE).insertOne(data, (err, result) => {
         assert.equal(err, null);
         callback(result);

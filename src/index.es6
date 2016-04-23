@@ -60,8 +60,6 @@ export default class Yis extends Bot {
 
   _username (channel, slackUsername, ghUsername) {
     let message = `Okay ${slackUsername }, setting ${ghUsername} as your GH username.`;
-    // add repo to db?
-    let pM = this.postMessage;
 
     this.DBConnection.insertUser(
       {
@@ -69,7 +67,7 @@ export default class Yis extends Bot {
         slack_username: slackUsername,
         pull_requests: []
       }, () => {
-      pM(channel, message, { as_user: true });
+      this.postMessage(channel, message, { as_user: true });
     });
   }
 
@@ -153,7 +151,7 @@ export default class Yis extends Bot {
 }
 
 let settings = {
-  token: 'foo'
+  token: ''
 , name: 'yisbot'
 };
 let yisbot = new Yis(settings);
