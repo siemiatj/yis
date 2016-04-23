@@ -15,6 +15,8 @@ export class YisGH {
       console.log('*** Pull Requests ***');
       console.log(data);
       console.log('*********************');
+
+      return data;
     });
   }
 
@@ -41,6 +43,6 @@ export class YisGH {
           events = event;
         }
       });
-    }
+    });
   }
 }
