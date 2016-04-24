@@ -13,7 +13,7 @@ export class YisGH {
   getAll(resolve, reject) {
     const client = this.client;
 
-    return new Bluebird( () => {
+    return new Bluebird(() => {
       client.pullRequests.getAll({ user: 'saucelabs', repo: 'yis' }, function(err, data) {
         if (err) {
           reject(err);
@@ -25,28 +25,38 @@ export class YisGH {
     });
   }
 
-  getFromRepo() {
-    this.client.events.getFromRepo({ user: 'saucelabs', repo: 'yis' }, function(err, data) {
-      console.log('*** Events ***');
-      // let eventTypes = { event}
-      let events = {};
-      let commitComment = { type: 'CommitCommentEvent' };
-      let issueComment = { type: 'IssueCommentEvent' };
-      let prComment = { type: 'PullRequestReviewCommentEvent' };
-      data.forEach(function(event) {
-        if (Object.keys(commitComment).every(function(key) { return event[key] === commitComment[key]; })) {
-          events = event;
+  getFromRepo(resolve, reject) {
+    const client = this.client;
+
+    return new Bluebird(() => {
+      client.events.getFromRepo({ user: 'saucelabs', repo: 'yis' }, function(err, data) {
+        if (err) {
+          reject(err);
         }
-      });
-      data.forEach(function(event) {
-        if (Object.keys(issueComment).every(function(key) { return event[key] === issueComment[key]; })) {
-          events = event;
-        }
-      });
-      data.forEach(function(event) {
-        if (Object.keys(prComment).every(function(key) { return event[key] === prComment[key]; })) {
-          events = event;
-        }
+
+        console.log('*** Events ***');
+        let events = {};
+        let commitComment = { type: 'CommitCommentEvent' };
+        let issueComment = { type: 'IssueCommentEvent' };
+        let prComment = { type: 'PullRequestReviewCommentEvent' };
+
+        data.forEach(function(event) {
+          if (Object.keys(commitComment).every(function(key) { return event[key] === commitComment[key]; })) {
+            events = event;
+          }
+        });
+        data.forEach(function(event) {
+          if (Object.keys(issueComment).every(function(key) { return event[key] === issueComment[key]; })) {
+            events = event;
+          }
+        });
+        data.forEach(function(event) {
+          if (Object.keys(prComment).every(function(key) { return event[key] === prComment[key]; })) {
+            events = event;
+          }
+        });
+
+        resolve(events);
       });
     });
   }
