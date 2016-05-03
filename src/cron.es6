@@ -9,7 +9,7 @@ const DBConnect = new YisDB();
 const GHClient = new YisGH();
 
 let job = new CronJob.CronJob('00 * * * * *', function () {
-  GHClient.getAll(ret => {
+  GHClient.test(ret => {
     console.log(ret);
     console.log('*********************');
   }, err => {

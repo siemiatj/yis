@@ -14,6 +14,21 @@ export class YisGH {
     });
   }
 
+  test(resolve, reject) {
+    const client = this.client;
+
+    return new Bluebird(() => {
+      client.repos.getAll({}, function(err, data) {
+        if (err) {
+          reject(err);
+        }
+        console.log('*** Repositories ***');
+
+        resolve(data);
+      });
+    });
+  }
+
   // this function should return data from the callback so we can access
   // the data in the cron script
   getAll(resolve, reject) {
