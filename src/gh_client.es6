@@ -6,6 +6,12 @@ import Bluebird from 'bluebird';
 export class YisGH {
   constructor() {
     this.client = new github({ version: '3.0.0' });
+
+    this.client.authenticate({
+      type: 'basic',
+      username: '',
+      password: ''
+    });
   }
 
   // this function should return data from the callback so we can access
