@@ -39,4 +39,9 @@ mongoimport --db yis --collection users --drop --file data/test_db.json
 npm install -g pm2
 pm2 start dist/server.js
 
+pm2 ls
+pm2 kill
 
+
+./bin/mongo
+&& mongod

@@ -12,5 +12,6 @@ as commits that they were pinged in.
 
 MongoDB
 NodeJS
+ES6/2015
 HapiJS
 
