@@ -17,6 +17,7 @@
     "bluebird": "3.3.5",
     "cron": "1.1.0",
     "github": "0.2.4",
+    "github4": "^1.0.0",
     "hapi": "13.3.0",
     "hapi-routes": "2.1.2",
     "mongodb": "2.1.16",
