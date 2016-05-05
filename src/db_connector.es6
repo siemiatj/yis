@@ -20,6 +20,42 @@ export class YisDB {
     });
   }
 
+  setRepositories(data, callback) {
+    const URL = this.dbUrl;
+    const TABLE = 'repositories';
+    const insert = function(db) {
+      db.collection(TABLE).insert(data, (err, result) => {
+        assert.equal(err, null);
+        callback(result);
+      });
+    };
+
+    MongoClient.connect(URL, function(err, db) {
+      assert.equal(null, err);
+      insert(db, function() {
+        db.close();
+      });
+    });
+  }
+
+  getRepositories(data, callback) {
+    const URL = this.dbUrl;
+    const TABLE = 'repositories';
+    const get = function(db) {
+      db.collection(TABLE).find({}, (err, result) => {
+        assert.equal(err, null);
+        callback(result);
+      });
+    };
+
+    MongoClient.connect(URL, function(err, db) {
+      assert.equal(null, err);
+      get(db, function() {
+        db.close();
+      });
+    });
+  }
+
   findUser(username, callback) {
     const URL = this.dbUrl;
     const TABLE = this.dbTable;
