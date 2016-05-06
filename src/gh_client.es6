@@ -1,6 +1,5 @@
 // module responsible for connecting to github
 /*eslint no-console: ["error", { allow: ["log"] }] */
-// import github from 'github';
 import GitHubApi from 'github4';
 import Bluebird from 'bluebird';
 
@@ -30,7 +29,7 @@ export class YisGH {
     const client = this.client;
 
     return new Bluebird(() => {
-      client.activity.getEventsForOrg({org: '', page: 1}, function(err, data) {
+      client.activity.getEventsForOrg({org: 'saucelabs', page: 1}, function(err, data) {
         if (err) {
           reject(err);
         }
@@ -73,13 +72,59 @@ export class YisGH {
     });
   }
 
+  // getNotificationsForUser(resolve, reject) {
+  //   const client = this.client;
+
+  //   return new Bluebird(() => {
+  //     client.pullRequests.getAll({ user: 'saucelabs', repo: 'yis' }, function(err, data) {
+  //       if (err) {
+  //         reject(err);
+  //       }
+  //       console.log('*** Notifications ***');
+
+  //       resolve(data);
+  //     });
+  //   });
+  // }
+
+  getEventsForRepo(resolve, reject) {
+    const client = this.client;
+
+    return new Bluebird(() => {
+      client.activity.getEventsForRepo({ user: 'saucelabs', repo: 'yis' }, function(err, data) {
+        if (err) {
+          reject(err);
+        }
+        console.log('*** Events for repo ***');
+
+        resolve(data);
+      });
+    });
+  }
+
+  // this one works, but returns only publicly available data
+  getEventsForUser(resolve, reject) {
+    const client = this.client;
+
+    return new Bluebird(() => {
+      client.activity.getEventsForUser({ user: 'saucelabs' }, function(err, data) {
+        if (err) {
+          reject(err);
+        }
+        console.log('*** Events for user ***');
+
+        resolve(data);
+      });
+    });
+  }
+
   // this function should return data from the callback so we can access
   // the data in the cron script
   getAll(resolve, reject) {
     const client = this.client;
 
     return new Bluebird(() => {
-      client.pullRequests.getAll({ user: 'saucelabs-user', repo: 'encore', state: 'open' }, function(err, data) {
+      client.pullRequests.getAll({ user: 'saucelabs', repo: 'yis', state: 'open' }, function(err, data) {
         if (err) {
           reject(err);
         }
