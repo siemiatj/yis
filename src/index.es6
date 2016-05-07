@@ -3,6 +3,13 @@
 import Bot from 'slackbots';
 import { YisDB } from './db_connector';
 
+// Add init step, when running bot for the first time.
+// require a list of repositories, or get all of them from
+// the gh api. Save them in DB as we'll be traversing data
+// per repository
+// * allow altering the list of repositories
+// We also need an organization name (the owner of the repositories)
+
 function find(arr, params) {
   var result = {};
 
@@ -20,6 +27,21 @@ export default class Yis extends Bot {
     super(settings);
 
     this.DBConnection = new YisDB();
+
+    let repositories = settings.repositories,
+      repoData = [];
+    if (repositories) {
+      repositories.forEach( r => {
+        repoData.push({
+          name: r
+        });
+        this.DBConnection.setRepositories(repoData, () => {
+          console.log('Repositories saved');
+        });
+      });
+    } else {
+      // implement
+    }
   }
 
   _getUserById (id) {
@@ -114,13 +136,14 @@ export default class Yis extends Bot {
 
   async _reply (originalMessage) {
     // index 0 should be yisbot, 1 command type?, 2 command parameter?
-    let message = originalMessage.text.replace(/^yisbot /, '').split(' ');
-    switch (message[0]) {
-      case 'username':
-        console.log('username');
+    let message = originalMessage.text.replace(/^yisbot /, '').split(' ')[0];
+    switch (message) {
+      case 'username': {
+        // console.log('username');
         let user = await this._getUserById(originalMessage.user);
         this._username(originalMessage.channel, user.name, message[1]);
         break;
+      }
       case 'add':
         this._addRepo(originalMessage.channel, message[1]);
         break;
@@ -151,11 +174,12 @@ export default class Yis extends Bot {
 }
 
 let settings = {
-  token: ''
-, name: 'yisbot'
+  token: '',
+  name: 'yisbot',
+  repositories: ['yis']
 };
 let yisbot = new Yis(settings);
-let params = { icon_url: 'http://www.awyisser.com/assets/images/thumbnail.png' };
+// let params = { icon_url: 'http://www.awyisser.com/assets/images/thumbnail.png' };
 // let channels = await yisbot.getChannels();
 // let channelID =
 //
