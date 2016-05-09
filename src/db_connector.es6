@@ -56,6 +56,25 @@ export class YisDB {
     });
   }
 
+  getUsers(callback) {
+    const URL = this.dbUrl;
+    const TABLE = this.dbTable;
+    const getAll = function(db) {
+      let cursor = db.collection(TABLE).find({});
+
+      cursor.toArray(function(err, doc) {
+        assert.equal(null, err);
+        db.close();
+        callback(doc);
+      });
+    };
+
+    MongoClient.connect(URL, function(err, db) {
+      assert.equal(null, err);
+      getAll(db);
+    });
+  }
+
   findUser(username, callback) {
     const URL = this.dbUrl;
     const TABLE = this.dbTable;
