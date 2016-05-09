@@ -41,36 +41,36 @@ export class YisGH {
   }
 
   // test function 
-  _test(resolve, reject) {
-    const client = this.client;
+  // _test(resolve, reject) {
+  //   const client = this.client;
 
-    return new Bluebird(() => {
-      client.repos.getAll({}, function(err, data) {
-        if (err) {
-          reject(err);
-        }
-        console.log('*** Repositories ***');
+  //   return new Bluebird(() => {
+  //     client.repos.getAll({}, function(err, data) {
+  //       if (err) {
+  //         reject(err);
+  //       }
+  //       console.log('*** Repositories ***');
 
-        resolve(data);
-      });
-    });
-  }
+  //       resolve(data);
+  //     });
+  //   });
+  // }
 
   // this gets events form an org. Huuge amount of data.
-  __test(resolve, reject) {
-    const client = this.client;
+  // __test(resolve, reject) {
+  //   const client = this.client;
 
-    return new Bluebird(() => {
-      client.events.getFromOrg({org: 'saucelabs', page: 1}, function(err, data) {
-        if (err) {
-          reject(err);
-        }
-        console.log('*** Repositories ***');
+  //   return new Bluebird(() => {
+  //     client.events.getFromOrg({org: 'saucelabs', page: 1}, function(err, data) {
+  //       if (err) {
+  //         reject(err);
+  //       }
+  //       console.log('*** Repositories ***');
 
-        resolve(data);
-      });
-    });
-  }
+  //       resolve(data);
+  //     });
+  //   });
+  // }
 
   // getNotificationsForUser(resolve, reject) {
   //   const client = this.client;
@@ -86,6 +86,22 @@ export class YisGH {
   //     });
   //   });
   // }
+
+  getCommentsForRepo(resolve, reject) {
+    const client = this.client;
+
+    return new Bluebird(() => {
+      client.pullRequests.getCommentsForRepo({ user: 'saucelabs', 
+        repo: 'yis', since: '2016-05-07T05:33:32.484Z' }, function(err, data) {
+        if (err) {
+          reject(err);
+        }
+        console.log('*** Comments for repo ***');
+
+        resolve(data);
+      });
+    });
+  }
 
   getEventsForRepo(resolve, reject) {
     const client = this.client;
@@ -103,37 +119,37 @@ export class YisGH {
   }
 
   // this one works, but returns only publicly available data
-  getEventsForUser(resolve, reject) {
-    const client = this.client;
+  // getEventsForUser(resolve, reject) {
+  //   const client = this.client;
 
-    return new Bluebird(() => {
-      client.activity.getEventsForUser({ user: 'saucelabs' }, function(err, data) {
-        if (err) {
-          reject(err);
-        }
-        console.log('*** Events for user ***');
+  //   return new Bluebird(() => {
+  //     client.activity.getEventsForUser({ user: 'saucelabs' }, function(err, data) {
+  //       if (err) {
+  //         reject(err);
+  //       }
+  //       console.log('*** Events for user ***');
 
-        resolve(data);
-      });
-    });
-  }
+  //       resolve(data);
+  //     });
+  //   });
+  // }
 
   // this function should return data from the callback so we can access
   // the data in the cron script
-  getAll(resolve, reject) {
-    const client = this.client;
+  // getAll(resolve, reject) {
+  //   const client = this.client;
 
-    return new Bluebird(() => {
-      client.pullRequests.getAll({ user: 'saucelabs', repo: 'yis', state: 'open' }, function(err, data) {
-        if (err) {
-          reject(err);
-        }
-        console.log('*** Pull Requests ***');
+  //   return new Bluebird(() => {
+  //     client.pullRequests.getAll({ user: 'saucelabs', repo: 'yis', state: 'open' }, function(err, data) {
+  //       if (err) {
+  //         reject(err);
+  //       }
+  //       console.log('*** Pull Requests ***');
 
-        resolve(data);
-      });
-    });
-  }
+  //       resolve(data);
+  //     });
+  //   });
+  // }
 
   getFromRepo(resolve, reject) {
     const client = this.client;

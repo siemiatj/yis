@@ -17,9 +17,14 @@ let job = new CronJob.CronJob('00 * * * * *', function () {
   //   console.log('There was an error : ', err);
   // });
 
-  GHClient.getEventsForRepo(ret => {
+  // GHClient.getEventsForRepo(ret => {
+  GHClient.getCommentsForRepo(ret => {
     console.log(ret);
     console.log('*********************');
+
+    DBConnect.getUsers(users => {
+      console.log('USERS: ', users);
+    });
   }, err => {
     console.log('There was an error : ', err);
   });
