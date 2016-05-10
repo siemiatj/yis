@@ -4,7 +4,7 @@ import GitHubApi from 'github4';
 import Bluebird from 'bluebird';
 
 export class YisGH {
-  constructor() {
+  constructor(username) {
     // this.client = new github({ version: '3.0.0' });
     this.client = new GitHubApi({
         // optional
@@ -17,6 +17,7 @@ export class YisGH {
         //     'user-agent': 'YIS bot' // GitHub is happy with a unique user agent
         // }
     });
+    this.ghUser = username;
 
     this.client.authenticate({
       type: 'basic',
@@ -27,9 +28,10 @@ export class YisGH {
 
   test(resolve, reject) {
     const client = this.client;
+    const user = this.ghUser;
 
     return new Bluebird(() => {
-      client.activity.getEventsForOrg({org: 'saucelabs', page: 1}, function(err, data) {
+      client.activity.getEventsForOrg({org: user, page: 1}, function(err, data) {
         if (err) {
           reject(err);
         }
@@ -87,11 +89,30 @@ export class YisGH {
   //   });
   // }
 
-  getCommentsForRepo(resolve, reject) {
+  // this function should return data from the callback so we can access
+  // the data in the cron script
+  getAll(resolve, reject) {
     const client = this.client;
+    const user = this.ghUser;
 
     return new Bluebird(() => {
-      client.pullRequests.getCommentsForRepo({ user: 'saucelabs', 
+      client.pullRequests.getAll({ user: user, repo: 'yis', state: 'open' }, function(err, data) {
+        if (err) {
+          reject(err);
+        }
+        console.log('*** Pull Requests ***');
+
+        resolve(data);
+      });
+    });
+  }
+
+  getCommentsForRepo(resolve, reject) {
+    const client = this.client;
+    const user = this.ghUser;
+
+    return new Bluebird(() => {
+      client.pullRequests.getCommentsForRepo({ user: user, 
         repo: 'yis', since: '2016-05-07T05:33:32.484Z' }, function(err, data) {
         if (err) {
           reject(err);
@@ -103,20 +124,20 @@ export class YisGH {
     });
   }
 
-  getEventsForRepo(resolve, reject) {
-    const client = this.client;
+  // getEventsForRepo(resolve, reject) {
+  //   const client = this.client;
 
-    return new Bluebird(() => {
-      client.activity.getEventsForRepo({ user: 'saucelabs', repo: 'yis' }, function(err, data) {
-        if (err) {
-          reject(err);
-        }
-        console.log('*** Events for repo ***');
+  //   return new Bluebird(() => {
+  //     client.activity.getEventsForRepo({ user: 'saucelabs', repo: 'encore' }, function(err, data) {
+  //       if (err) {
+  //         reject(err);
+  //       }
+  //       console.log('*** Events for repo ***');
 
-        resolve(data);
-      });
-    });
-  }
+  //       resolve(data);
+  //     });
+  //   });
+  // }
 
   // this one works, but returns only publicly available data
   // getEventsForUser(resolve, reject) {
@@ -128,23 +149,6 @@ export class YisGH {
   //         reject(err);
   //       }
   //       console.log('*** Events for user ***');
-
-  //       resolve(data);
-  //     });
-  //   });
-  // }
-
-  // this function should return data from the callback so we can access
-  // the data in the cron script
-  // getAll(resolve, reject) {
-  //   const client = this.client;
-
-  //   return new Bluebird(() => {
-  //     client.pullRequests.getAll({ user: 'saucelabs', repo: 'yis', state: 'open' }, function(err, data) {
-  //       if (err) {
-  //         reject(err);
-  //       }
-  //       console.log('*** Pull Requests ***');
 
   //       resolve(data);
   //     });
