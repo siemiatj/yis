@@ -38,7 +38,7 @@ export class YisDB {
     });
   }
 
-  getRepositories(data, callback) {
+  getRepositories(callback) {
     const URL = this.dbUrl;
     const TABLE = 'repositories';
     const get = function(db) {

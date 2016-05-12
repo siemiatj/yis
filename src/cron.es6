@@ -1,6 +1,6 @@
 // module running tasks : github, db operation, slack pinging
 /*eslint no-console: ["error", { allow: ["log"] }] */
-
+import 'babel-polyfill';
 import { YisDB } from './db_connector';
 import { YisGH } from './gh_client';
 import CronJob from 'cron';
@@ -15,17 +15,16 @@ let getUsersData = function() {
   return new Bluebird((resolve, reject) => {
     DBConnect.getUsers((users, error) => {
       if (error !== null) reject(error);
-      console.log('USERS');
       resolve(users);
     });
   });
 };
 
 let getReposData = function() {
+  // FIXME
   return new Bluebird((resolve, reject) => {
     DBConnect.getRepositories((repos, error) => {
       if (error !== null) reject(error);
-      console.log('REPOSITORIES');
       resolve(repos);
     });
   });
@@ -50,14 +49,12 @@ let job = new CronJob.CronJob('00 * * * * *', function () {
       console.log('ERROR: ', error);
     }
     console.log('FOO');
+    console.log('USERS: ', users);
+    console.log('REPOS: ', repositories);
+    console.log('SETTINGS: ', config);
   }
 
   getDBData();
-
-  console.log('AFTER GETTING DATA');
-  console.log('USERS: ', users);
-  console.log('REPOS: ', repositories);
-  console.log('SETTINGS: ', config);
 
   // get users from the db
   // get repos that the bot is set to check from the db
