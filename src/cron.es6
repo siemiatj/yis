@@ -4,12 +4,61 @@
 import { YisDB } from './db_connector';
 import { YisGH } from './gh_client';
 import CronJob from 'cron';
+import Bluebird from 'bluebird';
 import moment from 'moment';
+// import assert from 'assert';
 
 const DBConnect = new YisDB();
 const GHClient = new YisGH('saucelabs');
 
+let getUsersData = function() {
+  return new Bluebird((resolve, reject) => {
+    DBConnect.getUsers((users, error) => {
+      if (error !== null) reject(error);
+      console.log('USERS');
+      resolve(users);
+    });
+  });
+};
+
+let getReposData = function() {
+  return new Bluebird((resolve, reject) => {
+    DBConnect.getRepositories((repos, error) => {
+      if (error !== null) reject(error);
+      console.log('REPOSITORIES');
+      resolve(repos);
+    });
+  });
+};
+
+function getIntegrationData() {
+  //IMPLEMENT ME
+  console.log('CONFIG');
+}
+
 let job = new CronJob.CronJob('00 * * * * *', function () {
+  let users = null;
+  let repositories = null;
+  let config = null;
+
+  async function getDBData() {
+    try {
+      users = await getUsersData();
+      repositories = await getReposData();
+      config = await getIntegrationData();
+    } catch(error) {
+      console.log('ERROR: ', error);
+    }
+    console.log('FOO');
+  }
+
+  getDBData();
+
+  console.log('AFTER GETTING DATA');
+  console.log('USERS: ', users);
+  console.log('REPOS: ', repositories);
+  console.log('SETTINGS: ', config);
+
   // get users from the db
   // get repos that the bot is set to check from the db
 
@@ -24,14 +73,14 @@ let job = new CronJob.CronJob('00 * * * * *', function () {
   // save current timestamp
 
 
-  GHClient.getCommentsForRepo(ret => {
-    console.log(ret);
-    console.log('*********************');
+  // GHClient.getCommentsForRepo(ret => {
+  //   console.log(ret);
+  //   console.log('*********************');
 
-    DBConnect.getUsers(users => {
-      console.log('USERS: ', users);
-    });
-  }, err => {
-    console.log('There was an error : ', err);
-  });
+  //   DBConnect.getUsers(users => {
+  //     console.log('USERS: ', users);
+  //   });
+  // }, err => {
+  //   console.log('There was an error : ', err);
+  // });
 }, null, true, 'America/Los_Angeles');

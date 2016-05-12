@@ -43,8 +43,8 @@ export class YisDB {
     const TABLE = 'repositories';
     const get = function(db) {
       db.collection(TABLE).find({}, (err, result) => {
-        assert.equal(err, null);
-        callback(result);
+        // assert.equal(err, null);
+        callback(result, err);
       });
     };
 
@@ -63,9 +63,9 @@ export class YisDB {
       let cursor = db.collection(TABLE).find({});
 
       cursor.toArray(function(err, doc) {
-        assert.equal(null, err);
+        // assert.equal(null, err);
         db.close();
-        callback(doc);
+        callback(doc, err);
       });
     };
 
