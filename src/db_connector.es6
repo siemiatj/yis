@@ -20,13 +20,13 @@ export class YisDB {
     });
   }
 
-  setRepositories(data, callback) {
+  setConfig(data, callback) {
     const URL = this.dbUrl;
     const TABLE = 'config';
     const insert = function(db) {
-      db.collection(TABLE).insert(data, (err, result) => {
-        assert.equal(err, null);
-        callback(result);
+      db.collection(TABLE).insert(data, err => {
+        // assert.equal(err, null);
+        callback(err);
       });
     };
 
@@ -38,7 +38,7 @@ export class YisDB {
     });
   }
 
-  getRepositories(callback) {
+  getConfig(callback) {
     const URL = this.dbUrl;
     const TABLE = 'config';
     const get = function(db) {
@@ -62,7 +62,7 @@ export class YisDB {
     const getAll = function(db) {
       let cursor = db.collection(TABLE).find({});
 
-      cursor.toArray(function(err, doc) {
+      cursor(function(err, doc) {
         // assert.equal(null, err);
         db.close();
         callback(doc, err);
