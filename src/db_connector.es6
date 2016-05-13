@@ -22,7 +22,7 @@ export class YisDB {
 
   setRepositories(data, callback) {
     const URL = this.dbUrl;
-    const TABLE = 'repositories';
+    const TABLE = 'config';
     const insert = function(db) {
       db.collection(TABLE).insert(data, (err, result) => {
         assert.equal(err, null);
@@ -40,7 +40,7 @@ export class YisDB {
 
   getRepositories(callback) {
     const URL = this.dbUrl;
-    const TABLE = 'repositories';
+    const TABLE = 'config';
     const get = function(db) {
       db.collection(TABLE).find({}, (err, result) => {
         // assert.equal(err, null);
