@@ -1,5 +1,10 @@
 {
-    "gh_username": "test1",
-    "slack_username": "slacktest",
-    "pull_requests": []
+    "gh_username": "",
+    "slack_username": "",
+    "settings": {
+        "repositories": [""],
+        "comments": [""]
+    },
+    "pull_requests": [],
+    "comments": []
 }

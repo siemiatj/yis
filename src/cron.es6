@@ -14,7 +14,7 @@ const GHClient = new YisGH('saucelabs');
 const botSettings = {
   token: '',
   name: '',
-  repositories: ['', ''],
+  repositories: [],
   last_run: null
 };
 let YISbot = new Yis(botSettings);
@@ -73,10 +73,11 @@ let collectData = new CronJob.CronJob('00 * * * * *', function () {
     } catch(error) {
       console.log('ERROR: ', error);
     }
-    console.log('USERS: ', users);
+    console.log('USERS: ', usersData);
     console.log('SETTINGS: ', config);
 
     // get timestamp of last API request from the db
+    config = config[0];
     configTime = config.last_run;
     // get repos that the bot is set to check from the db
     configRepositories = config.repositories;
@@ -86,7 +87,8 @@ let collectData = new CronJob.CronJob('00 * * * * *', function () {
     usersData.forEach(usr => {
       users[usr.gh_username] = {
         pull_requests: [],
-        comments: []
+        comments: [],
+        slack_username: usr.slack_username
       };
     });
 

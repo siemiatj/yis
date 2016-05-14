@@ -20,12 +20,28 @@ export class YisDB {
     });
   }
 
+  dropConfig(callback) {
+    const URL = this.dbUrl;
+    const TABLE = 'config';
+    const drop = function(db) {
+      db.collection(TABLE).drop(res => {
+        callback(res);
+      });
+    };
+
+    MongoClient.connect(URL, function(err, db) {
+      assert.equal(null, err);
+      drop(db, function() {
+        db.close();
+      });
+    });
+  }
+
   setConfig(data, callback) {
     const URL = this.dbUrl;
     const TABLE = 'config';
     const insert = function(db) {
       db.collection(TABLE).insert(data, err => {
-        // assert.equal(err, null);
         callback(err);
       });
     };
@@ -46,12 +62,7 @@ export class YisDB {
 
       cursor.toArray(function(err, doc) {
         db.close();
-
-        if (doc.length === 1) {
-          callback(doc[0], err);
-        } else {
-          callback(null, err);
-        }
+        callback(doc, err);
       });
     };
 

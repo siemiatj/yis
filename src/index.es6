@@ -28,8 +28,10 @@ export default class Yis extends Bot {
 
     this.config = settings;
     this.DBConnection = new YisDB();
-    this.DBConnection.setConfig(settings, () => {
-      console.log('Config saved');
+    this.DBConnection.dropConfig(() => {
+      this.DBConnection.setConfig(settings, resp => {
+        console.log('Config saved: ', resp);
+      });
     });
   }
 
