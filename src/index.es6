@@ -26,24 +26,11 @@ export default class Yis extends Bot {
   constructor(settings) {
     super(settings);
 
+    this.config = settings;
     this.DBConnection = new YisDB();
-
-    let repositories = settings.repositories,
-      repoData = {
-        repositories: []
-      };
-    if (repositories) {
-      repositories.forEach( r => {
-        repoData.repositories.push({
-          name: r
-        });
-        this.DBConnection.setRepositories(repoData, () => {
-          console.log('Repositories saved');
-        });
-      });
-    } else {
-      console.log('No repositories list to init YISBot with !');
-    }
+    this.DBConnection.setConfig(settings, () => {
+      console.log('Config saved');
+    });
   }
 
   _getUserById (id) {

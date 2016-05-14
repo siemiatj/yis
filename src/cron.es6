@@ -14,7 +14,8 @@ const GHClient = new YisGH('saucelabs');
 const botSettings = {
   token: '',
   name: '',
-  repositories: ['', '']
+  repositories: ['', ''],
+  last_run: null
 };
 let YISbot = new Yis(botSettings);
 YISbot.on('start', params => {
@@ -63,8 +64,11 @@ let collectData = new CronJob.CronJob('00 * * * * *', function () {
     let config = null;
     let repositories = {};
 
+
     try {
+      // get users from the db
       usersData = await getUsersData();
+      // get config (with repositories and last check timestamp)
       config = await getIntegrationData();
     } catch(error) {
       console.log('ERROR: ', error);
@@ -72,9 +76,13 @@ let collectData = new CronJob.CronJob('00 * * * * *', function () {
     console.log('USERS: ', users);
     console.log('SETTINGS: ', config);
 
+    // get timestamp of last API request from the db
     configTime = config.last_run;
+    // get repos that the bot is set to check from the db
     configRepositories = config.repositories;
 
+    // turn users into an object with gh_username as key 
+    // and another object with comments/pull_requests keys as value
     usersData.forEach(usr => {
       users[usr.gh_username] = {
         pull_requests: [],
@@ -84,58 +92,25 @@ let collectData = new CronJob.CronJob('00 * * * * *', function () {
 
     console.log('USERS STRUCT: ', users);
 
+    // iterate over repos from config
     configRepositories.forEach(repo => {
       console.log('REPO: ', repo.name);
+
+      // get PR's for each repo and save them
+      // {
+      //   <repo_name>: {
+      //     pull_requests: []
+      //   }
+      // }
+
       // GHClient.getPullRequestsForRepo(repo, ret => {
       //   console.log(ret);
       //   console.log('*********************');
       // }, err => {
       //   console.log('There was an error : ', err);
       // });
-    });
 
-
-  // timestamp format : '2016-05-07T05:33:32.484Z'
-  // if (!last_check) {
-  //   // run 
-  // }
-  // GHClient.getCommentsForRepo(timestamp, ret => {
-  //   console.log(ret);
-  //   console.log('*********************');
-
-  //   DBConnect.getUsers(users => {
-  //     console.log('USERS: ', users);
-  //   });
-  // }, err => {
-  //   console.log('There was an error : ', err);
-  // });
-
-    // setSearchTimestamp();
-  }
-
-  getData();
-
-  // get users from the db
-    // turn users into an object with gh_username as key 
-    // and another object with comments/pull_requests keys as value
-    // {
-    //   <user>: {
-    //     pull_requests: [],
-    //     comments: []
-    //   }
-    // }
-
-  // get repos that the bot is set to check from the db
-  // get timestamp of last API request from the db
-
-  // iterate over repos from config
-    // get PR's for each repo and save them
-    // {
-    //   <repo_name>: {
-    //     pull_requests: []
-    //   }
-    // }
-    // get events for each repo limited by timestamp (or from start of the day today if 
+      // get events for each repo limited by timestamp (or from start of the day today if 
       // it's the first run) and save them
       // {
       //   <repo_name>: {
@@ -143,7 +118,20 @@ let collectData = new CronJob.CronJob('00 * * * * *', function () {
       //     comments: []
       //   }
       // }
-  // for each user check new PR's, comments on PR's, comments on commits
+    });
 
-  // save current timestamp
+  // for each user 
+    // check new PR's user is assigned to
+      // save on our users object
+
+    // check comments
+      // this is going to be tricky, as we need to parse the whole discussion over a PR
+      // and find comments where our user's name was mentioned. And if it was mentioned, we
+      // need to see if our user responded to that later, or not
+
+  // timestamp format : '2016-05-07T05:33:32.484Z'
+  // setSearchTimestamp();
+  }
+
+  getData();
 }, null, true, 'America/Los_Angeles');

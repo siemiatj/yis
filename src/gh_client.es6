@@ -20,7 +20,7 @@ export class YisGH {
     this.ghUser = username;
 
     this.client.authenticate({
-      type: 'basic',
+      type: '',
       username: '',
       password: ''
     });
@@ -91,12 +91,12 @@ export class YisGH {
 
   // this function should return data from the callback so we can access
   // the data in the cron script
-  getAll(resolve, reject) {
+  getPullRequestsForRepo(repository, resolve, reject) {
     const client = this.client;
     const user = this.ghUser;
 
     return new Bluebird(() => {
-      client.pullRequests.getAll({ user: user, repo: 'yis', state: 'open' }, function(err, data) {
+      client.pullRequests.getAll({ user: user, repo: repository, page: 1 }, function(err, data) {
         if (err) {
           reject(err);
         }
@@ -107,13 +107,13 @@ export class YisGH {
     });
   }
 
-  getCommentsForRepo(resolve, reject) {
+  getCommentsForRepo(timestamp, resolve, reject) {
     const client = this.client;
     const user = this.ghUser;
 
     return new Bluebird(() => {
       client.pullRequests.getCommentsForRepo({ user: user, 
-        repo: 'yis', since: '2016-05-07T05:33:32.484Z' }, function(err, data) {
+        repo: 'encore', since: timestamp }, function(err, data) {
         if (err) {
           reject(err);
         }
