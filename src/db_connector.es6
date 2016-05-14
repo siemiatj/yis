@@ -41,16 +41,23 @@ export class YisDB {
   getConfig(callback) {
     const URL = this.dbUrl;
     const TABLE = 'config';
-    const get = function(db) {
-      db.collection(TABLE).find({}, (err, result) => {
-        // assert.equal(err, null);
-        callback(result, err);
+    const getConfig = function(db) {
+      let cursor = db.collection(TABLE).find({});
+
+      cursor.toArray(function(err, doc) {
+        db.close();
+
+        if (doc.length === 1) {
+          callback(doc[0], err);
+        } else {
+          callback(null, err);
+        }
       });
     };
 
     MongoClient.connect(URL, function(err, db) {
       assert.equal(null, err);
-      get(db, function() {
+      getConfig(db, function() {
         db.close();
       });
     });
@@ -62,8 +69,7 @@ export class YisDB {
     const getAll = function(db) {
       let cursor = db.collection(TABLE).find({});
 
-      cursor(function(err, doc) {
-        // assert.equal(null, err);
+      cursor.toArray(function(err, doc) {
         db.close();
         callback(doc, err);
       });
