@@ -29,10 +29,12 @@ export default class Yis extends Bot {
     this.DBConnection = new YisDB();
 
     let repositories = settings.repositories,
-      repoData = [];
+      repoData = {
+        repositories: []
+      };
     if (repositories) {
       repositories.forEach( r => {
-        repoData.push({
+        repoData.repositories.push({
           name: r
         });
         this.DBConnection.setRepositories(repoData, () => {
@@ -40,7 +42,7 @@ export default class Yis extends Bot {
         });
       });
     } else {
-      // implement
+      console.log('No repositories list to init YISBot with !');
     }
   }
 
@@ -86,8 +88,7 @@ export default class Yis extends Bot {
     this.DBConnection.insertUser(
       {
         gh_username: ghUsername,
-        slack_username: slackUsername,
-        pull_requests: []
+        slack_username: slackUsername
       }, () => {
       this.postMessage(channel, message, { as_user: true });
     });
@@ -171,22 +172,38 @@ export default class Yis extends Bot {
         break;
     }
   }
+
+  _commentMessage() {
+    return 'BRAZILLION of comments you haven\'t replied to. You\'re irresponsible, shit !';
+  }
+
+  _prMessage() {
+    return 'bazillion of prs without response you lazy bum !';
+  }
+
+  async pingUser (type, slackUsername, payload) {
+    let payloadMessage = type === 'pr' ? this._prMessage(payload) : this._commentMessage(payload);
+    let message = `Okay ${slackUsername }, you've got ${payloadMessage}`;
+
+    // save chanel on bot when initializing it, use hardcoded for now)
+    this.postMessage('yis', message, { as_user: true });
+  }
 }
 
-let settings = {
-  token: '',
-  name: 'yisbot',
-  repositories: ['yis']
-};
-let yisbot = new Yis(settings);
+// let settings = {
+//   token: '',
+//   name: 'yisbot',
+//   repositories: []
+// };
+// let yisbot = new Yis(settings);
 // let params = { icon_url: 'http://www.awyisser.com/assets/images/thumbnail.png' };
 // let channels = await yisbot.getChannels();
 // let channelID =
 //
-yisbot.on('start', params => {
-  yisbot.postMessageToChannel('yis', 'aww yis', params);
-});
+// yisbot.on('start', params => {
+//   yisbot.postMessageToChannel('yis', 'aww yis', params);
+// });
 
-yisbot.on('message', data => {
-  yisbot._onMessage(data);
-});
+// yisbot.on('message', data => {
+//   yisbot._onMessage(data);
+// });
