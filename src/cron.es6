@@ -98,12 +98,8 @@ let collectData = new CronJob.CronJob('00 * * * * *', function () {
     configRepositories.forEach(repo => {
       console.log('REPO: ', repo.name);
 
-      // get PR's for each repo and save them
-      // {
-      //   <repo_name>: {
-      //     pull_requests: []
-      //   }
-      // }
+      // get PR's for each repo and check if users from our list
+      // are assigned. If yes - save that in `pull_requests` field in `users` object
 
       // GHClient.getPullRequestsForRepo(repo, ret => {
       //   console.log(ret);
@@ -116,16 +112,12 @@ let collectData = new CronJob.CronJob('00 * * * * *', function () {
       // it's the first run) and save them
       // {
       //   <repo_name>: {
-      //     pull_requests: [],
       //     comments: []
       //   }
       // }
     });
 
   // for each user 
-    // check new PR's user is assigned to
-      // save on our users object
-
     // check comments
       // this is going to be tricky, as we need to parse the whole discussion over a PR
       // and find comments where our user's name was mentioned. And if it was mentioned, we
