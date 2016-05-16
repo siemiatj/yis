@@ -162,17 +162,26 @@ export default class Yis extends Bot {
     }
   }
 
-  _commentMessage() {
+  _commentMessage(payload) {
     return 'BRAZILLION of comments you haven\'t replied to. You\'re irresponsible, shit !';
   }
 
-  _prMessage() {
-    return 'bazillion of prs without response you lazy bum !';
+  _prMessage(payload) {
+    let message = [''];
+
+    if (payload.length) {
+      message = ['You have ', payload.length, ' pull requests. \n'];
+      payload.forEach(pr => {
+        message.push(pr, '\n');
+      });
+    }
+
+    return message.join('');
   }
 
-  async pingUser (type, slackUsername, payload) {
-    let payloadMessage = type === 'pr' ? this._prMessage(payload) : this._commentMessage(payload);
-    let message = `Okay ${slackUsername }, you've got ${payloadMessage}`;
+  pingUser (slackUsername, prPayload, commentsPayload) {
+    let payloadMessage = this._prMessage(prPayload) + this._commentMessage(commentsPayload);
+    let message = `Okay @${slackUsername }, this is what I've got for you this time: \n ${payloadMessage}`;
 
     // save chanel on bot when initializing it, use hardcoded for now)
     this.postMessage('yis', message, { as_user: true });
