@@ -20,7 +20,7 @@ export class YisGH {
     this.ghUser = username;
 
     this.client.authenticate({
-      type: '',
+      type: 'basic',
       username: '',
       password: ''
     });
@@ -41,53 +41,6 @@ export class YisGH {
       });
     });
   }
-
-  // test function 
-  // _test(resolve, reject) {
-  //   const client = this.client;
-
-  //   return new Bluebird(() => {
-  //     client.repos.getAll({}, function(err, data) {
-  //       if (err) {
-  //         reject(err);
-  //       }
-  //       console.log('*** Repositories ***');
-
-  //       resolve(data);
-  //     });
-  //   });
-  // }
-
-  // this gets events form an org. Huuge amount of data.
-  // __test(resolve, reject) {
-  //   const client = this.client;
-
-  //   return new Bluebird(() => {
-  //     client.events.getFromOrg({org: 'saucelabs', page: 1}, function(err, data) {
-  //       if (err) {
-  //         reject(err);
-  //       }
-  //       console.log('*** Repositories ***');
-
-  //       resolve(data);
-  //     });
-  //   });
-  // }
-
-  // getNotificationsForUser(resolve, reject) {
-  //   const client = this.client;
-
-  //   return new Bluebird(() => {
-  //     client.pullRequests.getAll({ user: 'saucelabs', repo: 'yis' }, function(err, data) {
-  //       if (err) {
-  //         reject(err);
-  //       }
-  //       console.log('*** Notifications ***');
-
-  //       resolve(data);
-  //     });
-  //   });
-  // }
 
   // this function should return data from the callback so we can access
   // the data in the cron script
@@ -123,37 +76,6 @@ export class YisGH {
       });
     });
   }
-
-  // getEventsForRepo(resolve, reject) {
-  //   const client = this.client;
-
-  //   return new Bluebird(() => {
-  //     client.activity.getEventsForRepo({ user: 'saucelabs', repo: 'encore' }, function(err, data) {
-  //       if (err) {
-  //         reject(err);
-  //       }
-  //       console.log('*** Events for repo ***');
-
-  //       resolve(data);
-  //     });
-  //   });
-  // }
-
-  // this one works, but returns only publicly available data
-  // getEventsForUser(resolve, reject) {
-  //   const client = this.client;
-
-  //   return new Bluebird(() => {
-  //     client.activity.getEventsForUser({ user: 'saucelabs' }, function(err, data) {
-  //       if (err) {
-  //         reject(err);
-  //       }
-  //       console.log('*** Events for user ***');
-
-  //       resolve(data);
-  //     });
-  //   });
-  // }
 
   getFromRepo(resolve, reject) {
     const client = this.client;
