@@ -54,6 +54,20 @@ let setSearchTimestamp = () => {
   });
 };
 
+let getPullRequests = repository => {
+  return new Bluebird((resolve, reject) => {
+    GHClient.getPullRequestsForRepo(repository, ret => {
+      console.log('PULL REQUESTS');
+      console.log(ret);
+      console.log('*********************');
+      resolve(ret);
+    }, err => {
+      console.log('There was an error : ', err);
+      reject(err);
+    });
+  });
+};
+
 // this function runs only a few times a day max (so that it won't exceed )
 let collectData = new CronJob.CronJob('00 * * * * *', function () {
   async function getData() {
@@ -62,8 +76,8 @@ let collectData = new CronJob.CronJob('00 * * * * *', function () {
     let configRepositories = null;
     let configTime = null;
     let config = null;
-    let repositories = {};
-
+    let pullRequests = [];
+    let comments = [];
 
     try {
       // get users from the db
@@ -73,8 +87,6 @@ let collectData = new CronJob.CronJob('00 * * * * *', function () {
     } catch(error) {
       console.log('ERROR: ', error);
     }
-    console.log('USERS: ', usersData);
-    console.log('SETTINGS: ', config);
 
     // get timestamp of last API request from the db
     config = config[0];
@@ -92,36 +104,32 @@ let collectData = new CronJob.CronJob('00 * * * * *', function () {
       };
     });
 
-    console.log('USERS STRUCT: ', users);
-
+    let prs = null;
+    let events = null;
     // iterate over repos from config
-    configRepositories.forEach(repo => {
-      console.log('REPO: ', repo.name);
+    for (let i = 0, l = configRepositories.length; i<l; i+=1) {
+      prs = await getPullRequests(configRepositories[i]);
+      // events = await getEvents(repo);
+      pullRequests.push(prs);
+      // comments.push(events);
+    }
 
-      // get PR's for each repo and check if users from our list
-      // are assigned. If yes - save that in `pull_requests` field in `users` object
+    // get PR's for each repo and check if users from our list
+    // are assigned. If yes - save that in `pull_requests` field in `users` object
 
-      // GHClient.getPullRequestsForRepo(repo, ret => {
-      //   console.log(ret);
-      //   console.log('*********************');
-      // }, err => {
-      //   console.log('There was an error : ', err);
-      // });
+    // get events for each repo limited by timestamp (or from start of the day today if 
+    // it's the first run) and save them
+    // {
+    //   <repo_name>: {
+    //     comments: []
+    //   }
+    // }
 
-      // get events for each repo limited by timestamp (or from start of the day today if 
-      // it's the first run) and save them
-      // {
-      //   <repo_name>: {
-      //     comments: []
-      //   }
-      // }
-    });
-
-  // for each user 
-    // check comments
-      // this is going to be tricky, as we need to parse the whole discussion over a PR
-      // and find comments where our user's name was mentioned. And if it was mentioned, we
-      // need to see if our user responded to that later, or not
+    // for each user 
+      // check comments
+        // this is going to be tricky, as we need to parse the whole discussion over a PR
+        // and find comments where our user's name was mentioned. And if it was mentioned, we
+        // need to see if our user responded to that later, or not
 
   // timestamp format : '2016-05-07T05:33:32.484Z'
   // setSearchTimestamp();
