@@ -2,8 +2,8 @@
     "gh_username": "",
     "slack_username": "",
     "settings": {
-        "repositories": [""],
-        "comments": [""]
+        "pull_requests": ["yis"],
+        "comments": ["yis"]
     },
     "pull_requests": [],
     "comments": []
