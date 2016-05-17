@@ -97,7 +97,7 @@ export class YisDB {
     const URL = this.dbUrl;
     const TABLE = this.dbTable;
     const find = function(db) {
-      let cursor = db.collection(TABLE).find( { 'gh_username': username } );
+      let cursor = db.collection(TABLE).find({ $or: [{ gh_username: username }, { slack_username: username }] });
 
       cursor.toArray(function(err, doc) {
         assert.equal(null, err);
@@ -130,14 +130,41 @@ export class YisDB {
     });
   }
 
+  // used for updating ping times
   updateUser(username, data, callback) {
     const URL = this.dbUrl;
     const TABLE = this.dbTable;
     const update = db => {
       db.collection(TABLE).updateOne(
-        { gh_username: username },
+        { $or: [{ gh_username: username }, { slack_username: username }] },
         {
           $set: data
+        }, (err, result) => {
+          assert.equal(err, null);
+          if (callback) {
+            callback(result);
+          }
+        }
+      );
+    };
+
+    MongoClient.connect(URL, function(err, db) {
+      assert.equal(null, err);
+      update(db, function() {
+        db.close();
+      });
+    });
+  }
+
+  // used for updating repos, pull requests, comments etc
+  updateUsersArrayData(username, data, callback) {
+    const URL = this.dbUrl;
+    const TABLE = this.dbTable;
+    const update = db => {
+      db.collection(TABLE).updateOne(
+        { $or: [{ gh_username: username }, { slack_username: username }] },
+        {
+          $addToSet: data
         }, (err, result) => {
           assert.equal(err, null);
           if (callback) {
