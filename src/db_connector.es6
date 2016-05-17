@@ -142,7 +142,7 @@ export class YisDB {
         }, (err, result) => {
           assert.equal(err, null);
           if (callback) {
-            callback(result);
+            callback(result, err);
           }
         }
       );
@@ -161,14 +161,22 @@ export class YisDB {
     const URL = this.dbUrl;
     const TABLE = this.dbTable;
     const update = db => {
+      // TODO: add support for updating multiple fields at once
+      let insertData = {};
+      for (let [key, value] of Object.entries(data)) {
+        insertData[key] = {
+          $each : value
+        };
+      }
+
       db.collection(TABLE).updateOne(
         { $or: [{ gh_username: username }, { slack_username: username }] },
         {
-          $addToSet: data
+          $addToSet: insertData
         }, (err, result) => {
           assert.equal(err, null);
           if (callback) {
-            callback(result);
+            callback(result, err);
           }
         }
       );
