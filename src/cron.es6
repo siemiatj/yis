@@ -6,7 +6,9 @@ import { YisGH } from './gh_client';
 import Yis from './index';
 import CronJob from 'cron';
 import Bluebird from 'bluebird';
+// import moment from 'moment';
 import { contains } from 'underscore-node';
+// import assert from 'assert';
 
 const DBConnect = new YisDB();
 const GHClient = new YisGH('saucelabs');
@@ -63,6 +65,30 @@ let getPullRequests = repository => {
     });
   });
 };
+
+let pingUsers = new CronJob.CronJob('30 * * * * *', function () {
+  async function checkPing() {
+    try {
+      // get users from the db
+      usersData = await getUsersData();
+      // config = await getIntegrationData();
+    } catch(error) {
+      console.log('Error getting data from the DB: ', error);
+    }
+
+    // for each user
+    for (let data of Object.values(usersData)) {
+      
+      // check if it's time to ping - if yes, ping user and reset prs/comments
+      // in the db
+      if (data.pull_requests.length || data.comments.length) {
+        YISbot.pingUser(data.slack_username, data.pull_requests, data.comments);
+      }
+    }
+  }
+
+  checkPing();
+}, null, true, 'America/Los_Angeles');
 
 // this function runs only a few times a day max (so that it won't exceed )
 let collectData = new CronJob.CronJob('00 * * * * *', function () {
@@ -135,25 +161,22 @@ let collectData = new CronJob.CronJob('00 * * * * *', function () {
             users[username].pull_requests.push(pr.html_url);
           }
         });
-      }  
-    }
-
-    // for each user
-    for (let [usr, usrData] of Object.entries(users)) {
-      // check prs
-      if (usrData.pull_requests.length || usrData.comments.length) {
-        YISbot.pingUser(usrData.slack_username, usrData.pull_requests, usrData.comments);
       }
-      // check comments
-        // this is going to be tricky, as we need to parse the whole discussion over a PR
-        // and find comments where our user's name was mentioned. And if it was mentioned, we
-        // need to see if our user responded to that later, or not
-
-      // save prs/comments in the DB for the pinging function to use
     }
 
-  // timestamp format : '2016-05-07T05:33:32.484Z'
-  // setSearchTimestamp();
+    // check comments
+      // this is going to be tricky, as we need to parse the whole discussion over a PR
+      // and find comments where our user's name was mentioned. And if it was mentioned, we
+      // need to see if our user responded to that later, or not
+
+    // save info about user's prs/comments in the db
+    for (let [usr, usrData] of Object.entries(users)) {
+      // save prs/comments in the DB for the pinging function to use
+      DBConnect.updateUser(usr, usrData);
+    }
+
+    // timestamp format : '2016-05-07T05:33:32.484Z'
+    // setSearchTimestamp();
   }
 
   getData();
