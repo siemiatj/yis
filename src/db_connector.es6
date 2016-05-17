@@ -62,6 +62,7 @@ export class YisDB {
 
       cursor.toArray(function(err, doc) {
         db.close();
+
         callback(doc, err);
       });
     };
@@ -114,7 +115,7 @@ export class YisDB {
   insertUser(data, callback) {
     const URL = this.dbUrl;
     const TABLE = this.dbTable;
-    const insert = function(db) {
+    const insert = db => {
       db.collection(TABLE).insertOne(data, (err, result) => {
         assert.equal(err, null);
         callback(result);
@@ -129,17 +130,19 @@ export class YisDB {
     });
   }
 
-  updateUser(username, data) {
+  updateUser(username, data, callback) {
     const URL = this.dbUrl;
     const TABLE = this.dbTable;
-    const update = (db, callback) => {
+    const update = db => {
       db.collection(TABLE).updateOne(
         { gh_username: username },
         {
           $set: data
         }, (err, result) => {
           assert.equal(err, null);
-          callback(result);
+          if (callback) {
+            callback(result);
+          }
         }
       );
     };
