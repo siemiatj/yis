@@ -102,7 +102,7 @@ export class YisDB {
       cursor.toArray(function(err, doc) {
         assert.equal(null, err);
         db.close();
-        callback(doc);
+        callback(doc, err);
       });
     };
 

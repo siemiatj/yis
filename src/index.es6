@@ -75,22 +75,56 @@ export default class Yis extends Bot {
     ghUsername = ghUsername.join('');
     let message = `Okay ${slackUsername }, setting ${ghUsername} as your GH username.`;
 
-    this.DBConnection.insertUser({
-      gh_username: ghUsername,
-      slack_username: slackUsername,
-      settings: {
-        repositories: [],
-        pull_requests_ping: 8,
-        comments_ping: 8
-      },
-      pull_requests: [],
-      comments: [],
-      pull_request_last_ping: null,
-      comments_last_ping: null
-    }, (res, err) => {
+    this.DBConnection.findUser(slackUsername, (res, err) => {
       if (err !== null) {
+        this.postMessage(channel, 'I know this user or encountered a DB error.', { as_user: true });
+      } else if (res.length) {
+        this.DBConnection.updateUser(slackUsername,
+          { 'gh_username': ghUsername }, (res, err) => {
+            if (err !== null || !res.modifiedCount) {
+              this.postMessage(channel, 'I failed badly. Try again.', { as_user: true });
+            } else {
+              this.postMessage(channel, message, { as_user: true });
+            }
+          }
+        );
+      } else {
+        this.DBConnection.insertUser({
+          gh_username: ghUsername,
+          slack_username: slackUsername,
+          settings: {
+            repositories: [],
+            pull_requests_ping: 8,
+            comments_ping: 8
+          },
+          pull_requests: [],
+          comments: [],
+          pull_request_last_ping: null,
+          comments_last_ping: null
+        }, (res, err) => {
+          if (err !== null) {
+            this.postMessage(channel, 'I failed badly. Try again.', { as_user: true });
+          } else {
+            this.postMessage(channel, message, { as_user: true });
+          }
+        });
+      }
+    });
+  }
+
+  _me (channel, slackUsername) {
+    this.DBConnection.findUser(slackUsername, (res, err) => {
+      if (!res.length || err !== null) {
         this.postMessage(channel, 'I failed badly. Try again.', { as_user: true });
       } else {
+        res = res[0];
+
+        let message = `Okay ${slackUsername }, here's what I know about you:
+         - github username: ${res.gh_username} as your GH username.
+         - repositories you want to get pinged on: ${res.settings.repositories}
+         - pull requests ping times (hours): ${res.settings.pull_requests_ping}
+         - comments ping times (hours): ${res.settings.comments_ping}`;
+
         this.postMessage(channel, message, { as_user: true });
       }
     });
@@ -202,6 +236,10 @@ export default class Yis extends Bot {
         this._username(originalMessage.channel, user.name, parsedCommand);
         break;
       }
+      case 'me': {
+        this._me(originalMessage.channel, user.name);
+        break;
+      }
       case 'add':
         this._addRepo(originalMessage.channel, user.name, parsedCommand);
         break;
@@ -230,7 +268,7 @@ export default class Yis extends Bot {
     }
   }
 
-  _commentMessage(payload) {
+  _commentMessage() {
     return 'Messages not supported at the moment.';
   }
 
