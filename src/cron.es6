@@ -91,7 +91,7 @@ let getPullRequests = repository => {
 };
 
 // this function should run quite often
-cron.schedule('*/5 * * * *', function () {
+cron.schedule('*/20 * * * *', function () {
   async function checkPing() {
     let usersData = null;
     let usersToUpdate = [];
@@ -108,7 +108,7 @@ cron.schedule('*/5 * * * *', function () {
     for (let data of Object.values(usersData)) {
       let timediff = null;
       if (data.pull_request_last_ping) {
-        timediff = timeNow.diff(moment(data.pull_request_last_ping), 'minutes');
+        timediff = timeNow.diff(moment(data.pull_request_last_ping), 'hours');
       }
 
       // check if it's time to ping - if yes, ping user
@@ -129,7 +129,7 @@ cron.schedule('*/5 * * * *', function () {
 });
 
 // probably this function should only run every hour or so
-cron.schedule('*/10 * * * *', function () {
+cron.schedule('0 * * * *', function () {
   async function getData() {
     let usersData = null;
     let users = {};
@@ -188,15 +188,19 @@ cron.schedule('*/10 * * * *', function () {
 
     // get PR's for each repo and check if users from our list
     // are assigned. If yes - save that in `pull_requests` field in `users` object
-    let username = null;
+    let assignee = null;
+    let username;
     for (repoName in pullRequests) {
       if (pullRequests.hasOwnProperty(repoName)) {
         prs = pullRequests[repoName];
-
         prs.forEach(pr => {
-          username = pr.assignee.login;
-          if (users[username] && contains(users[username].settings.repositories, repoName)) {
-            users[username].pull_requests.push(pr.html_url);
+          assignee = pr.assignee;
+          if (assignee) {
+            username = assignee.login;
+
+            if (users[username] && contains(users[username].settings.repositories, repoName)) {
+              users[username].pull_requests.push(pr.html_url);
+            }
           }
         });
       }

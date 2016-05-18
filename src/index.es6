@@ -256,8 +256,7 @@ export default class Yis extends Bot {
         this._meme(originalMessage.channel);
         break;
       default:
-        // this.postMessage(originalMessage.channel, 'ayyy, lmao', { as_user: true });
-        // no command type
+        this._meme(originalMessage.channel);
         break;
     }
   }
