@@ -72,6 +72,7 @@ export default class Yis extends Bot {
   }
 
   _username (channel, slackUsername, ghUsername) {
+    ghUsername = ghUsername.join('');
     let message = `Okay ${slackUsername }, setting ${ghUsername} as your GH username.`;
 
     this.DBConnection.insertUser({
@@ -83,7 +84,9 @@ export default class Yis extends Bot {
         comments_ping: 8
       },
       pull_requests: [],
-      comments: []
+      comments: [],
+      pull_request_last_ping: null,
+      comments_last_ping: null
     }, (res, err) => {
       if (err) {
         this.postMessage(channel, 'I failed badly. Try again.', { as_user: true });
@@ -213,25 +216,6 @@ export default class Yis extends Bot {
     let payloadMessage = this._prMessage(prPayload) + this._commentMessage(commentsPayload);
     let message = `Okay @${slackUsername }, this is what I've got for you this time: \n ${payloadMessage}`;
 
-    // save chanel on bot when initializing it, use hardcoded for now)
-    this.postMessage('yis', message, { as_user: true });
+    this.postMessage(this.config.channel, message, { as_user: true });
   }
 }
-
-// let settings = {
-//   token: '',
-//   name: 'yisbot',
-//   repositories: []
-// };
-// let yisbot = new Yis(settings);
-// let params = { icon_url: 'http://www.awyisser.com/assets/images/thumbnail.png' };
-// let channels = await yisbot.getChannels();
-// let channelID =
-//
-// yisbot.on('start', params => {
-//   yisbot.postMessageToChannel('yis', 'aww yis', params);
-// });
-
-// yisbot.on('message', data => {
-//   yisbot._onMessage(data);
-// });
