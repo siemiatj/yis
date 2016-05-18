@@ -6,7 +6,7 @@ import { YisGH } from './gh_client';
 import Yis from './index';
 import CronJob from 'cron';
 import Bluebird from 'bluebird';
-// import moment from 'moment';
+import moment from 'moment';
 import { contains } from 'underscore-node';
 // import assert from 'assert';
 
@@ -15,7 +15,8 @@ const GHClient = new YisGH('saucelabs');
 const botSettings = {
   token: '',
   name: 'yisbot',
-  repositories: ['yis'],
+  channel: 'yis',
+  repositories: [],
   last_run: null
 };
 let YISbot = new Yis(botSettings);
@@ -33,6 +34,30 @@ let getUsersData = function() {
       resolve(users);
     });
   });
+};
+
+let resetUsersTimers = async function(usersArray) {
+  let timeStamp = new Date().getTime();
+  let updateSingleUser = function(username) {
+    return new Bluebird((resolve, reject) => {
+      let data = {
+        pull_requests: [],
+        comments: [],
+        pull_request_last_ping: timeStamp,
+        comments_last_ping: timeStamp
+      };
+      DBConnect.updateUser(username, data, (config, error) => {
+        if (error !== null) reject(error);
+        resolve(config);
+      });
+    });
+  };
+  let resetPromises = [];
+  for (var i=0, l=usersArray.length; i<l; i+=1) {
+    resetPromises.push(updateSingleUser.call(null, usersArray[i]));
+  }
+
+  return Bluebird.all(resetPromises);
 };
 
 let getIntegrationData = function() {
@@ -66,31 +91,46 @@ let getPullRequests = repository => {
   });
 };
 
+// this function should run quite often
 let pingUsers = new CronJob.CronJob('30 * * * * *', function () {
   async function checkPing() {
+    let usersData = null;
+    let usersToUpdate = [];
+    let timeNow = moment(new Date());
+
     try {
       // get users from the db
       usersData = await getUsersData();
-      // config = await getIntegrationData();
     } catch(error) {
       console.log('Error getting data from the DB: ', error);
     }
 
-    // for each user
     for (let data of Object.values(usersData)) {
-      
-      // check if it's time to ping - if yes, ping user and reset prs/comments
-      // in the db
-      if (data.pull_requests.length || data.comments.length) {
-        YISbot.pingUser(data.slack_username, data.pull_requests, data.comments);
+      let timediff = null;
+      if (data.pull_request_last_ping) {
+        timediff = moment(data.pull_request_last_ping).diff(timeNow, 'minutes');
       }
+
+      // check if it's time to ping - if yes, ping user and reset prs/comments
+      // in the db. Reset the ping time for user.
+      if (data.pull_requests.length && (!data.pull_request_last_ping || timediff >= data.settings.pull_requests_ping)) {
+        // YISbot.pingUser(data.slack_username, data.pull_requests, data.comments);
+        // save user that gets updated to clear his pull_request/comments arrays and reset ping timestamps
+        usersToUpdate.push(data.gh_username);
+      }
+    }
+
+    //update users in the db
+    if (usersToUpdate.length) {
+      await resetUsersTimers(usersToUpdate);
     }
   }
 
   checkPing();
 }, null, true, 'America/Los_Angeles');
 
-// this function runs only a few times a day max (so that it won't exceed )
+// */10 * * * *
+// probably this function should only run every hour or so
 let collectData = new CronJob.CronJob('00 * * * * *', function () {
   async function getData() {
     let usersData = null;
@@ -157,7 +197,7 @@ let collectData = new CronJob.CronJob('00 * * * * *', function () {
 
         prs.forEach(pr => {
           username = pr.assignee.login;
-          if (users[username] && contains(users[username].settings.pull_requests, repoName)) {
+          if (users[username] && contains(users[username].settings.repositories, repoName)) {
             users[username].pull_requests.push(pr.html_url);
           }
         });
@@ -172,6 +212,7 @@ let collectData = new CronJob.CronJob('00 * * * * *', function () {
     // save info about user's prs/comments in the db
     for (let [usr, usrData] of Object.entries(users)) {
       // save prs/comments in the DB for the pinging function to use
+      // TODO: use updateUsersArrayData instead !!
       DBConnect.updateUser(usr, usrData);
     }
 
