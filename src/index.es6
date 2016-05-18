@@ -69,12 +69,12 @@ export default class Yis extends Bot {
 
     this.DBConnection.findUser(slackUsername, (res, err) => {
       if (err !== null) {
-        this.postMessage(channel, 'I know this user or encountered a DB error.', { as_user: true });
+        this.postMessage(channel, 'I couldn\'t find this user or encountered a DB error.', { as_user: true });
       } else if (res.length) {
         this.DBConnection.updateUser(slackUsername,
           { 'gh_username': ghUsername }, (res, err) => {
             if (err !== null || !res.modifiedCount) {
-              this.postMessage(channel, 'I failed badly. Try again.', { as_user: true });
+              this.postMessage(channel, 'I know this user or there was an error. Please try again.', { as_user: true });
             } else {
               this.postMessage(channel, message, { as_user: true });
             }
@@ -107,7 +107,7 @@ export default class Yis extends Bot {
   _me (channel, slackUsername) {
     this.DBConnection.findUser(slackUsername, (res, err) => {
       if (!res.length || err !== null) {
-        this.postMessage(channel, 'I failed badly. Try again.', { as_user: true });
+        this.postMessage(channel, 'Without your space helmet, Dave? You\'re going to find that rather difficult.', { as_user: true });
       } else {
         res = res[0];
 
@@ -129,7 +129,7 @@ export default class Yis extends Bot {
     this.DBConnection.updateUsersArrayData(slackUsername, true,
       { 'settings.repositories': repos }, (res, err) => {
         if (err !== null || !res.modifiedCount) {
-          this.postMessage(channel, 'Is your user already added to my list.' +   
+          this.postMessage(channel, 'My response is, we don\'t have enough fuel for an earlier departure.' +   
             'Try running `yisbot username <your_gh_username>` first.', { as_user: true });
         } else {
           this.postMessage(channel, message, { as_user: true });
@@ -145,7 +145,7 @@ export default class Yis extends Bot {
     this.DBConnection.updateUsersArrayData(slackUsername, false,
       { 'settings.repositories': repos }, (res, err) => {
         if (err !== null || !res.modifiedCount) {
-          this.postMessage(channel, 'Is your user already added to my list.' +   
+          this.postMessage(channel, 'This mission is too important for me to allow you to jeopardize it.' +   
             'Try running `yisbot username <your_gh_username>` first.', { as_user: true });
         } else {
           this.postMessage(channel, message, { as_user: true });
@@ -164,7 +164,7 @@ export default class Yis extends Bot {
     this.DBConnection.updateUser(slackUsername,
       { 'settings.pull_requests_ping': hour }, (res, err) => {
         if (err !== null || !res.modifiedCount) {
-          this.postMessage(channel, 'Is your user already added to my list?' +
+          this.postMessage(channel, 'I think you know what the problem is just as well as I do.' +
             'Try running `yisbot username <your_gh_username>` first.', { as_user: true });
         } else {
           this.postMessage(channel, message, { as_user: true });
@@ -184,7 +184,7 @@ export default class Yis extends Bot {
     this.DBConnection.updateUser(slackUsername,
       { 'settings.comments_ping': hour }, (res, err) => {
         if (err || !res.modifiedCount) {
-          this.postMessage(channel, 'Is your user already added to my list?' +   
+          this.postMessage(channel, 'Just what do you think you\'re doing, Dave ?' +   
             'Try running `yisbot username <your_gh_username>` first.', { as_user: true });
         } else {
           this.postMessage(channel, message, { as_user: true });
@@ -196,7 +196,7 @@ export default class Yis extends Bot {
   _clear (channel, slackUsername) {
     this.DBConnection.updateUser(slackUsername, { 'settings.repositories': [] }, (res, err) => {
       if (err || !res.nModified) {
-        this.postMessage(channel, 'Is your user already added to my list.' +   
+        this.postMessage(channel, 'Is your user already added to my list ?' +   
           'Try running `yisbot username <your_gh_username>` first.', { as_user: true });
       } else {
         this.postMessage(channel, 'Okay, I\'ll clear your GH reminder repos' , { as_user: true });
@@ -204,12 +204,31 @@ export default class Yis extends Bot {
     });
   }
 
-  _meme (channel) {
-    this.postMessage(channel, 'Awww yiss, mf\'ing breadcrumbs!', { as_user: true });
+  _config (channel) {
+    this.DBConnection.getConfig((config, error) => {
+      if (error !== null) {
+        this.postMessage(channel, 'I\'m sorry, Dave. I\'m afraid I can\'t do that.' , { as_user: true });
+      } else {
+        config = config[0];
+        let message = `Here's my current config:
+          - repositories: ${config.repositories}
+          - botname: ${config.name}
+          - channel: ${config.channel}
+          - last gh crawl: ${config.last_run}`;
+
+        this.postMessage(channel, message , { as_user: true });
+      }
+    });
+  }
+
+  _meme (channel, msg) {
+    let message = msg || 'Awww yiss, mf\'ing breadcrumbs!';
+    this.postMessage(channel, message, { as_user: true });
   }
 
   _help (channel) {
     let message = 'YISbot commands: \n' +
+    '`yisbot config`: show configuration the bot was started with \n' +
     '`yisbot username <github username>`: add or change your GitHub username\n' +
     '`yisbot me`: check user info currently stored in the db\n' +
     '`yisbot add <repo name> <repo name>`: add a repos to watch for PR\'s and comments\n' +
@@ -252,8 +271,11 @@ export default class Yis extends Bot {
       case 'help':
         this._help(originalMessage.channel);
         break;
-      case 'breadcrumbs':
-        this._meme(originalMessage.channel);
+      case 'config':
+        this._config(originalMessage.channel);
+        break;        
+      case 'ping':
+        this._meme(originalMessage.channel, 'pong');
         break;
       default:
         this._meme(originalMessage.channel);
