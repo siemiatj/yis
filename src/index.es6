@@ -164,7 +164,6 @@ export default class Yis extends Bot {
 
   _pr (channel, slackUsername, hour) {
     hour = parseInt(hour[0], 10);
-
     if (hour > 72 || hour < 1) {
       this.postMessage(channel, 'Incorrect interval. Supported interval 1-72h', { as_user: true });
     }
@@ -173,7 +172,7 @@ export default class Yis extends Bot {
     this.DBConnection.updateUser(slackUsername,
       { 'settings.pull_requests_ping': hour }, (res, err) => {
         if (err !== null || !res.modifiedCount) {
-          this.postMessage(channel, 'Is your user already added to my list?' +   
+          this.postMessage(channel, 'Is your user already added to my list?' +
             'Try running `yisbot username <your_gh_username>` first.', { as_user: true });
         } else {
           this.postMessage(channel, message, { as_user: true });
@@ -289,6 +288,6 @@ export default class Yis extends Bot {
     let payloadMessage = this._prMessage(prPayload) + this._commentMessage(commentsPayload);
     let message = `Okay @${slackUsername }, this is what I've got for you this time: \n ${payloadMessage}`;
 
-    this.postMessage(this.config.channel, message, { as_user: true });
+    this.postMessageToUser(slackUsername, message, { as_user: true });
   }
 }
