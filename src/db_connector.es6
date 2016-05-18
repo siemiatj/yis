@@ -118,7 +118,7 @@ export class YisDB {
     const insert = db => {
       db.collection(TABLE).insertOne(data, (err, result) => {
         assert.equal(err, null);
-        callback(result);
+        callback(result, err);
       });
     };
 
@@ -157,24 +157,29 @@ export class YisDB {
   }
 
   // used for updating repos, pull requests, comments etc
-  updateUsersArrayData(username, data, callback) {
+  updateUsersArrayData(username, insert, data, callback) {
     const URL = this.dbUrl;
     const TABLE = this.dbTable;
     const update = db => {
-      // TODO: add support for updating multiple fields at once,
+      // TODO: add support for adding multiple fields at once,
       // ie prs and comments at the same time
-      let insertData = {};
+      let arrayData = {};
+      let operation = {};
       for (let [key, value] of Object.entries(data)) {
-        insertData[key] = {
+        arrayData[key] = {
           $each : value
         };
       }
 
+      if (insert) {
+        operation = { $addToSet: arrayData };
+      } else {
+        operation = { $pullAll: data };
+      }
+
       db.collection(TABLE).updateOne(
         { $or: [{ gh_username: username }, { slack_username: username }] },
-        {
-          $addToSet: insertData
-        }, (err, result) => {
+        operation, (err, result) => {
           assert.equal(err, null);
           if (callback) {
             callback(result, err);
