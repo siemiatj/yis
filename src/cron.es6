@@ -71,7 +71,7 @@ let getIntegrationData = function() {
 
 let setSearchTimestamp = () => {
   return new Bluebird((resolve, reject) => {
-    let time = new Date().getTime();
+    let time = new Date().toISOString();
 
     DBConnect.setConfig({ last_run: time }, error => {
       if (error !== null) reject(error);
@@ -215,8 +215,8 @@ let collectData = new CronJob.CronJob('00 * * * * *', function () {
       DBConnect.updateUser(usr, usrData);
     }
 
-    // timestamp format : '2016-05-07T05:33:32.484Z'
-    // setSearchTimestamp();
+    // save timestamp of current search
+    setSearchTimestamp();
   }
 
   getData();
