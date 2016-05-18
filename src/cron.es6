@@ -16,7 +16,7 @@ const botSettings = {
   token: '',
   name: 'yisbot',
   channel: 'yis',
-  repositories: [],
+  repositories: ['yis'],
   last_run: null
 };
 let YISbot = new Yis(botSettings);
@@ -99,23 +99,23 @@ let pingUsers = new CronJob.CronJob('30 * * * * *', function () {
     let timeNow = moment(new Date());
 
     try {
-      // get users from the db
+      // this could probably already filter out users without any prs/comments
       usersData = await getUsersData();
     } catch(error) {
       console.log('Error getting data from the DB: ', error);
+      return;
     }
 
     for (let data of Object.values(usersData)) {
       let timediff = null;
       if (data.pull_request_last_ping) {
-        timediff = moment(data.pull_request_last_ping).diff(timeNow, 'minutes');
+        timediff = timeNow.diff(moment(data.pull_request_last_ping), 'minutes');
       }
 
-      // check if it's time to ping - if yes, ping user and reset prs/comments
-      // in the db. Reset the ping time for user.
+      // check if it's time to ping - if yes, ping user
       if (data.pull_requests.length && (!data.pull_request_last_ping || timediff >= data.settings.pull_requests_ping)) {
-        // YISbot.pingUser(data.slack_username, data.pull_requests, data.comments);
-        // save user that gets updated to clear his pull_request/comments arrays and reset ping timestamps
+        YISbot.pingUser(data.slack_username, data.pull_requests, data.comments);
+        // save user that gets updated to clear his pull_request/comments arrays and reset ping timestamps later
         usersToUpdate.push(data.gh_username);
       }
     }
@@ -129,7 +129,6 @@ let pingUsers = new CronJob.CronJob('30 * * * * *', function () {
   checkPing();
 }, null, true, 'America/Los_Angeles');
 
-// */10 * * * *
 // probably this function should only run every hour or so
 let collectData = new CronJob.CronJob('00 * * * * *', function () {
   async function getData() {
