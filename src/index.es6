@@ -88,7 +88,7 @@ export default class Yis extends Bot {
       pull_request_last_ping: null,
       comments_last_ping: null
     }, (res, err) => {
-      if (err) {
+      if (err !== null) {
         this.postMessage(channel, 'I failed badly. Try again.', { as_user: true });
       } else {
         this.postMessage(channel, message, { as_user: true });
@@ -100,9 +100,9 @@ export default class Yis extends Bot {
     let reposString = repos.join(',');
     let message = `Okay, adding ${reposString} to your reminders.`;
 
-    this.DBConnection.updateUsersArrayData(slackUsername,
+    this.DBConnection.updateUsersArrayData(slackUsername, true,
       { 'settings.repositories': repos }, (res, err) => {
-        if (err) {
+        if (err !== null || !res.modifiedCount) {
           this.postMessage(channel, 'Is your user already added to my list.' +   
             'Try running `yisbot username <your_gh_username>` first.', { as_user: true });
         } else {
@@ -113,29 +113,64 @@ export default class Yis extends Bot {
   }
 
   _removeRepo (channel, slackUsername, repos) {
-    let message = `Okay, removing ${repos} from your reminders.`;
-    this.postMessage(channel, message, { as_user: true });
-    // remove repo from db?
-    // create a updateUsersArrayData that uses $pull
+    let reposString = repos.join(',');
+    let message = `Okay, removing ${reposString} from your reminders.`;
+
+    this.DBConnection.updateUsersArrayData(slackUsername, false,
+      { 'settings.repositories': repos }, (res, err) => {
+        if (err !== null || !res.modifiedCount) {
+          this.postMessage(channel, 'Is your user already added to my list.' +   
+            'Try running `yisbot username <your_gh_username>` first.', { as_user: true });
+        } else {
+          this.postMessage(channel, message, { as_user: true });
+        }
+      }
+    );
   }
 
   _pr (channel, slackUsername, hour) {
+    hour = parseInt(hour[0], 10);
+
+    if (hour > 72 || hour < 1) {
+      this.postMessage(channel, 'Incorrect interval. Supported interval 1-72h', { as_user: true });
+    }
     let message = `Okay, I'll ping you about new pull requests every ${hour} hours.`;
-    this.postMessage(channel, message, { as_user: true });
-    // update interval and reset desired ping in db?
-    // use updateUser
+
+    this.DBConnection.updateUser(slackUsername,
+      { 'settings.pull_requests_ping': hour }, (res, err) => {
+        if (err !== null || !res.modifiedCount) {
+          this.postMessage(channel, 'Is your user already added to my list?' +   
+            'Try running `yisbot username <your_gh_username>` first.', { as_user: true });
+        } else {
+          this.postMessage(channel, message, { as_user: true });
+        }
+      }
+    );
   }
 
   _comment (channel, slackUsername, hour) {
+    hour = parseInt(hour[0], 10);
+
+    if (hour > 72 || hour < 1) {
+      this.postMessage(channel, 'Incorrect interval. Supported interval 1-72h', { as_user: true });
+    }
     let message = `Okay, I'll ping you about new comments every ${hour} hours.`;
-    this.postMessage(channel, message, { as_user: true });
-    // update interval and reset desired ping in db?
-    // use updateUser
+
+    this.DBConnection.updateUser(slackUsername,
+      { 'settings.comments_ping': hour }, (res, err) => {
+        if (err || !res.modifiedCount) {
+          this.postMessage(channel, 'Is your user already added to my list?' +   
+            'Try running `yisbot username <your_gh_username>` first.', { as_user: true });
+        } else {
+          this.postMessage(channel, message, { as_user: true });
+        }
+      }
+    );
   }
 
   _clear (channel, slackUsername) {
     this.DBConnection.updateUser(slackUsername, { 'settings.repositories': [] }, (res, err) => {
-      if (err) {
+      if (err || !res.nModified) {
         this.postMessage(channel, 'Is your user already added to my list.' +   
           'Try running `yisbot username <your_gh_username>` first.', { as_user: true });
       } else {
@@ -196,7 +231,7 @@ export default class Yis extends Bot {
   }
 
   _commentMessage(payload) {
-    return 'BRAZILLION of comments you haven\'t replied to. You\'re irresponsible, shit !';
+    return 'Messages not supported at the moment.';
   }
 
   _prMessage(payload) {
