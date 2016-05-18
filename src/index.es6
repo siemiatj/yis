@@ -156,7 +156,7 @@ export default class Yis extends Bot {
 
   _pr (channel, slackUsername, hour) {
     hour = parseInt(hour[0], 10);
-    if (hour > 72 || hour < 1) {
+    if (!hour || hour > 72 || hour < 1) {
       this.postMessage(channel, 'Incorrect interval. Supported interval 1-72h', { as_user: true });
     }
     let message = `Okay, I'll ping you about new pull requests every ${hour} hours.`;
@@ -176,7 +176,7 @@ export default class Yis extends Bot {
   _comment (channel, slackUsername, hour) {
     hour = parseInt(hour[0], 10);
 
-    if (hour > 72 || hour < 1) {
+    if (!hour || hour > 72 || hour < 1) {
       this.postMessage(channel, 'Incorrect interval. Supported interval 1-72h', { as_user: true });
     }
     let message = `Okay, I'll ping you about new comments every ${hour} hours.`;
