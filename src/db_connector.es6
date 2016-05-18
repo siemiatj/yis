@@ -130,7 +130,7 @@ export class YisDB {
     });
   }
 
-  // used for updating ping times
+  // used for updating ping times, and resetting prs/comments
   updateUser(username, data, callback) {
     const URL = this.dbUrl;
     const TABLE = this.dbTable;
@@ -161,7 +161,8 @@ export class YisDB {
     const URL = this.dbUrl;
     const TABLE = this.dbTable;
     const update = db => {
-      // TODO: add support for updating multiple fields at once
+      // TODO: add support for updating multiple fields at once,
+      // ie prs and comments at the same time
       let insertData = {};
       for (let [key, value] of Object.entries(data)) {
         insertData[key] = {
@@ -195,7 +196,8 @@ export class YisDB {
     const TABLE = this.dbTable;
     const remove = function(db, callback) {
       db.collection(TABLE).deleteOne(
-        { gh_username: username }, (err, result) => {
+        { $or: [{ gh_username: username }, { slack_username: username }] },
+        (err, result) => {
           assert.equal(err, null);
           callback(result);
         }
