@@ -1,20 +1,12 @@
 /*eslint no-console: ["error", { allow: ["log"] }] */
-// import request from 'request-promise';
 import Bot from 'slackbots';
 import { YisDB } from './db_connector';
-
-// Add init step, when running bot for the first time.
-// require a list of repositories, or get all of them from
-// the gh api. Save them in DB as we'll be traversing data
-// per repository
-// * allow altering the list of repositories
-// We also need an organization name (the owner of the repositories)
 
 function find(arr, params) {
   var result = {};
 
   arr.forEach(function(item) {
-    if (Object.keys(params).every(function(key) { return item[key] === params[key];})) {
+    if (Object.keys(params).every(function(key) { return item[key] === params[key]; })) {
       result = item;
     }
   });
@@ -131,7 +123,7 @@ export default class Yis extends Bot {
   }
 
   _addRepo (channel, slackUsername, repos) {
-    let reposString = repos.join(',');
+    let reposString = repos.join(', ');
     let message = `Okay, adding ${reposString} to your reminders.`;
 
     this.DBConnection.updateUsersArrayData(slackUsername, true,
@@ -147,7 +139,7 @@ export default class Yis extends Bot {
   }
 
   _removeRepo (channel, slackUsername, repos) {
-    let reposString = repos.join(',');
+    let reposString = repos.join(', ');
     let message = `Okay, removing ${reposString} from your reminders.`;
 
     this.DBConnection.updateUsersArrayData(slackUsername, false,
@@ -217,15 +209,18 @@ export default class Yis extends Bot {
   }
 
   _help (channel) {
-    let message = '```let me know what your GH username is: username <github username>\n' +
-    'add a repo to watch for PR\'s and comments: add <repo name>\n' +
-    'remove a repo you\'ve previously added: remove <repo name\n' +
-    'clear all repo\'s: clear```\n';
+    let message = 'YISbot commands: \n' +
+    '`yisbot username <github username>`: add or change your GitHub username\n' +
+    '`yisbot me`: check user info currently stored in the db\n' +
+    '`yisbot add <repo name> <repo name>`: add a repos to watch for PR\'s and comments\n' +
+    '`yisbot remove <repo name> <repo name>`: remove repos you\'ve previously added\n' +
+    '`yisbot clear`: clear all repo\'s\n'+
+    '`yisbot pr <hours>`: change ping interval for pull requests (1-72 range)\n' +
+    '`yisbot comment <hours>`change ping interval for comments (1-72 range)\n';
     this.postMessage(channel, message, { as_user: true });
   }
 
   async _reply (originalMessage) {
-    // index 0 should be yisbot, 1 command type?, the rest are command's parameters
     let parsedCommand = originalMessage.text.replace(/^yisbot /, '').split(' ');
     let command = parsedCommand.shift();
     let user = await this._getUserById(originalMessage.user);

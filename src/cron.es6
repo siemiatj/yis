@@ -4,11 +4,10 @@ import 'babel-polyfill';
 import { YisDB } from './db_connector';
 import { YisGH } from './gh_client';
 import Yis from './index';
-import CronJob from 'cron';
+import cron from 'node-cron';
 import Bluebird from 'bluebird';
 import moment from 'moment';
 import { contains } from 'underscore-node';
-// import assert from 'assert';
 
 const DBConnect = new YisDB();
 const GHClient = new YisGH('saucelabs');
@@ -92,7 +91,7 @@ let getPullRequests = repository => {
 };
 
 // this function should run quite often
-let pingUsers = new CronJob.CronJob('30 * * * * *', function () {
+cron.schedule('*/5 * * * *', function () {
   async function checkPing() {
     let usersData = null;
     let usersToUpdate = [];
@@ -127,10 +126,10 @@ let pingUsers = new CronJob.CronJob('30 * * * * *', function () {
   }
 
   checkPing();
-}, null, true, 'America/Los_Angeles');
+});
 
 // probably this function should only run every hour or so
-let collectData = new CronJob.CronJob('00 * * * * *', function () {
+cron.schedule('*/10 * * * *', function () {
   async function getData() {
     let usersData = null;
     let users = {};
@@ -214,10 +213,7 @@ let collectData = new CronJob.CronJob('00 * * * * *', function () {
       // TODO: use updateUsersArrayData instead !!
       DBConnect.updateUser(usr, usrData);
     }
-
-    // save timestamp of current search
-    setSearchTimestamp();
   }
 
   getData();
-}, null, true, 'America/Los_Angeles');
+});
