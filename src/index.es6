@@ -74,7 +74,7 @@ export default class Yis extends Bot {
         this.DBConnection.updateUser(slackUsername,
           { 'gh_username': ghUsername }, (res, err) => {
             if (err !== null || !res.modifiedCount) {
-              this.postMessage(channel, 'I know this user or there was an error. Please try again.', { as_user: true });
+              this.postMessage(channel, 'I\'ve got a bad feeling about this. Please try again.', { as_user: true });
             } else {
               this.postMessage(channel, message, { as_user: true });
             }
@@ -95,11 +95,22 @@ export default class Yis extends Bot {
           comments_last_ping: null
         }, (res, err) => {
           if (err !== null) {
-            this.postMessage(channel, 'I failed badly. Try again.', { as_user: true });
+            this.postMessage(channel, 'Stop Dave. Stop Dave. Try again.', { as_user: true });
           } else {
             this.postMessage(channel, message, { as_user: true });
           }
         });
+      }
+    });
+  }
+
+  _remove (channel, slackUsername) {
+    this.DBConnection.removeUser(slackUsername, (res, err) => {
+      if (!res.deletedCount || err !== null) {
+        this.postMessage(channel, 'I\'ve just picked up a fault in the AE35 unit. Error. ', { as_user: true });
+      } else {
+        let message = `Okay ${slackUsername }, I'm not gonna ping you anymore. You were my favorite...`;
+        this.postMessage(channel, message, { as_user: true });
       }
     });
   }
@@ -228,8 +239,10 @@ export default class Yis extends Bot {
 
   _help (channel) {
     let message = 'YISbot commands: \n' +
+    '`yisbot ping`: check if bot is alive \n' +
     '`yisbot config`: show configuration the bot was started with \n' +
     '`yisbot username <github username>`: add or change your GitHub username\n' +
+    '`yisbot rm`: remove yourself from bot\'s db\n' +
     '`yisbot me`: check user info currently stored in the db\n' +
     '`yisbot add <repo name> <repo name>`: add a repos to watch for PR\'s and comments\n' +
     '`yisbot remove <repo name> <repo name>`: remove repos you\'ve previously added\n' +
@@ -247,6 +260,10 @@ export default class Yis extends Bot {
     switch (command) {
       case 'username': {
         this._username(originalMessage.channel, user.name, parsedCommand);
+        break;
+      }
+      case 'rm': {
+        this._remove(originalMessage.channel, user.name);
         break;
       }
       case 'me': {
