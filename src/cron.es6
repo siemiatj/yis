@@ -20,18 +20,18 @@ const botSettings = {
 };
 let YISbot = new Yis(botSettings);
 YISbot.on('start', params => {
-  YISbot.postMessageToChannel('yis', 'aww yis', params);
+  YISbot.postMessageToChannel(botSettings.channel, 'aww yis', params);
 });
 YISbot.on('message', data => {
   YISbot._onMessage(data);
 });
 
-let getUsersData = function() {
+let getUsersData = function(filterNotEmpty) {
   return new Bluebird((resolve, reject) => {
     DBConnect.getUsers((users, error) => {
       if (error !== null) reject(error);
       resolve(users);
-    });
+    }, filterNotEmpty);
   });
 };
 
@@ -99,7 +99,7 @@ cron.schedule('*/20 * * * *', function () {
 
     try {
       // this could probably already filter out users without any prs/comments
-      usersData = await getUsersData();
+      usersData = await getUsersData(true);
     } catch(error) {
       console.log('Error getting data from the DB: ', error);
       return;
@@ -217,6 +217,8 @@ cron.schedule('0 * * * *', function () {
       // TODO: use updateUsersArrayData instead !!
       DBConnect.updateUser(usr, usrData);
     }
+
+    setSearchTimestamp();
   }
 
   getData();

@@ -23,7 +23,7 @@ export class YisDB {
   dropConfig(callback) {
     const URL = this.dbUrl;
     const TABLE = 'config';
-    const drop = function(db) {
+    const drop = db => {
       db.collection(TABLE).drop(res => {
         callback(res);
       });
@@ -40,10 +40,10 @@ export class YisDB {
   setConfig(data, callback) {
     const URL = this.dbUrl;
     const TABLE = 'config';
-    const insert = function(db) {
-      db.collection(TABLE).insert(data, err => {
+    const insert = db => {
+      db.collection(TABLE).findOneAndUpdate({}, { $set: data }, err => {
         callback(err);
-      });
+      }, { upsert: true });
     };
 
     MongoClient.connect(URL, function(err, db) {
@@ -57,7 +57,7 @@ export class YisDB {
   getConfig(callback) {
     const URL = this.dbUrl;
     const TABLE = 'config';
-    const getConfig = function(db) {
+    const getConfig = db => {
       let cursor = db.collection(TABLE).find({});
 
       cursor.toArray(function(err, doc) {
@@ -75,13 +75,23 @@ export class YisDB {
     });
   }
 
-  getUsers(callback) {
+  getUsers(callback, usersWithData) {
     const URL = this.dbUrl;
     const TABLE = this.dbTable;
-    const getAll = function(db) {
-      let cursor = db.collection(TABLE).find({});
+    const getAll = db => {
+      let cursor = null;
+      if (usersWithData) {
+        cursor = db.collection(TABLE).find({
+          $or: [
+            { pull_requests: { $gt: [] } },
+            { comments: { $gt: [] } }
+          ]
+        });
+      } else {
+        cursor = db.collection(TABLE).find({});
+      } 
 
-      cursor.toArray(function(err, doc) {
+      cursor.toArray((err, doc) => {
         db.close();
         callback(doc, err);
       });
@@ -96,7 +106,7 @@ export class YisDB {
   findUser(username, callback) {
     const URL = this.dbUrl;
     const TABLE = this.dbTable;
-    const find = function(db) {
+    const find = db => {
       let cursor = db.collection(TABLE).find({ $or: [{ gh_username: username }, { slack_username: username }] });
 
       cursor.toArray(function(err, doc) {
@@ -196,15 +206,15 @@ export class YisDB {
     });
   }
 
-  removeUser(username) {
+  removeUser(username, callback) {
     const URL = this.dbUrl;
     const TABLE = this.dbTable;
-    const remove = function(db, callback) {
+    const remove = db => {
       db.collection(TABLE).deleteOne(
         { $or: [{ gh_username: username }, { slack_username: username }] },
         (err, result) => {
           assert.equal(err, null);
-          callback(result);
+          callback(result, err);
         }
       );
     };
@@ -212,7 +222,6 @@ export class YisDB {
     MongoClient.connect(URL, function(err, db) {
       assert.equal(null, err);
       remove(db, function() {
-        console.log('User deleted');
         db.close();
       });
     });
