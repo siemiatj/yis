@@ -5,20 +5,16 @@ import Bluebird from 'bluebird';
 
 export class YisGH {
   constructor(username) {
-    // this.client = new github({ version: '3.0.0' });
     this.client = new GitHubApi({
-        // optional
-        debug: true
-        // protocol: 'https',
-        // host: "github.my-GHE-enabled-company.com", // should be api.github.com for GitHub
-        // pathPrefix: "/api/v3", // for some GHEs; none for GitHub
-        // timeout: 5000,
-        // headers: {
-        //     'user-agent': 'YIS bot' // GitHub is happy with a unique user agent
-        // }
+      debug: false
     });
     this.ghUser = username;
 
+    /*
+     * GitHub integration settings:
+     * username: username of GitHub user with access rights
+     * password: github application token [https://help.github.com/articles/creating-an-access-token-for-command-line-use/]
+     */
     this.client.authenticate({
       type: 'basic',
       username: '',
@@ -31,7 +27,7 @@ export class YisGH {
     const user = this.ghUser;
 
     return new Bluebird(() => {
-      client.activity.getEventsForOrg({org: user, page: 1}, function(err, data) {
+      client.activity.getEventsForOrg({ org: user, page: 1 }, function(err, data) {
         if (err) {
           reject(err);
         }
@@ -73,42 +69,6 @@ export class YisGH {
         console.log('*** Comments for repo ***');
 
         resolve(data);
-      });
-    });
-  }
-
-  getFromRepo(resolve, reject) {
-    const client = this.client;
-
-    return new Bluebird(() => {
-      client.events.getFromRepo({ user: 'saucelabs', repo: 'yis' }, function(err, data) {
-        if (err) {
-          reject(err);
-        }
-
-        console.log('*** Events ***');
-        let events = {};
-        let commitComment = { type: 'CommitCommentEvent' };
-        let issueComment = { type: 'IssueCommentEvent' };
-        let prComment = { type: 'PullRequestReviewCommentEvent' };
-
-        data.forEach(function(event) {
-          if (Object.keys(commitComment).every(function(key) { return event[key] === commitComment[key]; })) {
-            events = event;
-          }
-        });
-        data.forEach(function(event) {
-          if (Object.keys(issueComment).every(function(key) { return event[key] === issueComment[key]; })) {
-            events = event;
-          }
-        });
-        data.forEach(function(event) {
-          if (Object.keys(prComment).every(function(key) { return event[key] === prComment[key]; })) {
-            events = event;
-          }
-        });
-
-        resolve(events);
       });
     });
   }

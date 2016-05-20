@@ -10,12 +10,22 @@ import moment from 'moment';
 import { contains } from 'underscore-node';
 
 const DBConnect = new YisDB();
-const GHClient = new YisGH('saucelabs');
+/*
+ * change gh_org to your github organization name
+ */
+const GHClient = new YisGH('gh_org');
+/*
+ * Bot settings:
+ * token: slack bot token
+ * channel: name of the channel where bot should join
+ * repositories: what repositories within the organization bot should crawl using GitHub API
+ */
+const BOTNAME = 'yisbot';
 const botSettings = {
   token: '',
-  name: 'yisbot',
-  channel: 'yis',
-  repositories: ['yis'],
+  name: BOTNAME,
+  channel: '',
+  repositories: [],
   last_run: null
 };
 let YISbot = new Yis(botSettings);
@@ -128,7 +138,7 @@ cron.schedule('*/20 * * * *', function () {
   checkPing();
 });
 
-// probably this function should only run every hour or so
+// this function should only run every hour or so
 cron.schedule('0 * * * *', function () {
   async function getData() {
     let usersData = null;
