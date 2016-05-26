@@ -42,22 +42,22 @@ that will get crawled:
 
 ```javascript
 const botSettings = {
-	token: '',
-	name: BOTNAME,
-	channel: '',
-	repositories: [],
-	last_run: null
+  token: '',
+  name: BOTNAME,
+  channel: '',
+  repositories: [],
+  last_run: null
 }
 ```
 
 ## gh_client.es6
 
 ```javascript
-    this.client.authenticate({
-      type: 'basic',
-      username: '',
-      password: ''
-    });
+this.client.authenticate({
+  type: 'basic',
+  username: '',
+  password: ''
+});
 ```
 
 # Installation 
@@ -95,17 +95,19 @@ If you can see the `pong` message sent by bot, you're good to go.
 
 ## Commands
 
-`yisbot help`: show list of available commands 
-`yisbot ping`: check if bot is alive 
-`yisbot config`: show configuration the bot was started with 
-`yisbot username <github username>`: add or change your GitHub username 
-`yisbot rm`: remove yourself from bot's db 
-`yisbot me`: check user info currently stored in the db 
-`yisbot add <repo name> <repo name>`: add a repos to watch for PR's and comments 
-`yisbot remove <repo name> <repo name>`: remove repos you've previously added 
-`yisbot clear`: clear all repo's 
-`yisbot pr <hours>`: change ping interval for pull requests (1-72 range) 
-`yisbot comment <hours>`change ping interval for comments (1-72 range) 
+```
+'yisbot help': show list of available commands
+'yisbot ping': check if bot is alive
+'yisbot config': show configuration the bot was started with
+'yisbot username <github username>': add or change your GitHub username
+'yisbot rm': remove yourself from bot's db
+'yisbot me': check user info currently stored in the db
+'yisbot add <repo name> <repo name>': add a repos to watch for PR's and comments
+'yisbot remove <repo name> <repo name>': remove repos you've previously added
+'yisbot clear': clear all repo's
+'yisbot pr <hours>': change ping interval for pull requests (1-72 range)
+'yisbot comment <hours>': change ping interval for comments (1-72 range)
+```
 
 ## Sample flow
 
