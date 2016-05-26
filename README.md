@@ -20,8 +20,8 @@ get a private message from bot when the time comes.
 
 # Prerequisites
 
-This bot is meant to be run within organizations having multiple private repositories, but probably it'll also work with normal user accounts. To set it up a user with permissions
-to access repositories will be needed as well as a personal token for accessing GitHub API and which can be generated [here](https://github.com/settings/tokens/new).
+This bot is meant to be run within organizations having multiple private repositories, but probably it'll also work with normal user accounts. To set it up a user with permissions to access repositories will be needed as well as a personal token for accessing GitHub API and which can be generated [here](https://github.com/settings/tokens/new).
+
 Other than that, server running the bot needs a `MongoDB` instance running. We also suggest to install `pm2` for managing and monitoring node processes.
 See the `setup` file for instruction on how to set up an Amazon EC2 instance for running the bot.
 
@@ -32,14 +32,15 @@ To configure this slack bot you need to edit two files:
 ## cron.es6
 
 First set the organization name, by changing `gh_org` to your organization's name:
-```
+
+```javascript
 const GHClient = new YisGH('gh_org');
 ```
 
 Next set the previously generated Slack bot token, channel the bot should join and provide an array of repositories
 that will get crawled:
 
-```
+```javascript
 const botSettings = {
 	token: '',
 	name: BOTNAME,
@@ -50,7 +51,8 @@ const botSettings = {
 ```
 
 ## gh_client.es6
-```
+
+```javascript
     this.client.authenticate({
       type: 'basic',
       username: '',
@@ -86,24 +88,24 @@ After bot joins your channel, check if everything is working fine:
 
 ```
 yisbot ping
->yisbotZ pong
+$yisbot pong
 ```
 
 If you can see the `pong` message sent by bot, you're good to go.
 
 ## Commands
 
-`yisbot help`: show list of available commands
-`yisbot ping`: check if bot is alive
-`yisbot config`: show configuration the bot was started with
-`yisbot username <github username>`: add or change your GitHub username
-`yisbot rm`: remove yourself from bot's db
-`yisbot me`: check user info currently stored in the db
-`yisbot add <repo name> <repo name>`: add a repos to watch for PR's and comments
-`yisbot remove <repo name> <repo name>`: remove repos you've previously added
-`yisbot clear`: clear all repo's
-`yisbot pr <hours>`: change ping interval for pull requests (1-72 range)
-`yisbot comment <hours>`change ping interval for comments (1-72 range)
+`yisbot help`: show list of available commands 
+`yisbot ping`: check if bot is alive 
+`yisbot config`: show configuration the bot was started with 
+`yisbot username <github username>`: add or change your GitHub username 
+`yisbot rm`: remove yourself from bot's db 
+`yisbot me`: check user info currently stored in the db 
+`yisbot add <repo name> <repo name>`: add a repos to watch for PR's and comments 
+`yisbot remove <repo name> <repo name>`: remove repos you've previously added 
+`yisbot clear`: clear all repo's 
+`yisbot pr <hours>`: change ping interval for pull requests (1-72 range) 
+`yisbot comment <hours>`change ping interval for comments (1-72 range) 
 
 ## Sample flow
 
@@ -118,6 +120,20 @@ yisbot me
 ```
 
 # Advanced configuration
+
+One of the things you want to customize are the intervals between running the cron functions. 
+By default they're set to each 20 minutes for pinging script, and every hour for GitHub crawler.
+To alter them, edit crontabs in `cron.es6`:
+
+Pinger:
+```javascript
+cron.schedule('*/20 * * * *', function () {
+```
+
+Crawler:
+```javascript
+cron.schedule('0 * * * *', function () {
+```
 
 # Development
 
