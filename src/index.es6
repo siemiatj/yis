@@ -138,7 +138,7 @@ export default class Yis extends Bot {
     this.DBConnection.updateUsersArrayData(slackUsername, true,
       { 'settings.repositories': repos }, (res, err) => {
         if (err !== null || !res.modifiedCount) {
-          this.postMessage(channel, 'My response is, we don\'t have enough fuel for an earlier departure.' +   
+          this.postMessage(channel, 'My response is, we don\'t have enough fuel for an earlier departure.' +
             'Try running `yisbot username <your_gh_username>` first.', { as_user: true });
         } else {
           this.postMessage(channel, message, { as_user: true });
@@ -154,7 +154,7 @@ export default class Yis extends Bot {
     this.DBConnection.updateUsersArrayData(slackUsername, false,
       { 'settings.repositories': repos }, (res, err) => {
         if (err !== null || !res.modifiedCount) {
-          this.postMessage(channel, 'This mission is too important for me to allow you to jeopardize it.' +   
+          this.postMessage(channel, 'This mission is too important for me to allow you to jeopardize it.' +
             'Try running `yisbot username <your_gh_username>` first.', { as_user: true });
         } else {
           this.postMessage(channel, message, { as_user: true });
@@ -193,7 +193,7 @@ export default class Yis extends Bot {
     this.DBConnection.updateUser(slackUsername,
       { 'settings.comments_ping': hour }, (res, err) => {
         if (err || !res.modifiedCount) {
-          this.postMessage(channel, 'Just what do you think you\'re doing, Dave ?' +   
+          this.postMessage(channel, 'Just what do you think you\'re doing, Dave ?' +
             'Try running `yisbot username <your_gh_username>` first.', { as_user: true });
         } else {
           this.postMessage(channel, message, { as_user: true });
@@ -205,7 +205,7 @@ export default class Yis extends Bot {
   _clear (channel, slackUsername) {
     this.DBConnection.updateUser(slackUsername, { 'settings.repositories': [] }, (res, err) => {
       if (err || !res.nModified) {
-        this.postMessage(channel, 'Is your user already added to my list ?' +   
+        this.postMessage(channel, 'Is your user already added to my list ?' +
           'Try running `yisbot username <your_gh_username>` first.', { as_user: true });
       } else {
         this.postMessage(channel, 'Okay, I\'ll clear your GH reminder repos' , { as_user: true });
@@ -230,6 +230,11 @@ export default class Yis extends Bot {
     });
   }
 
+  _ping (channel) {
+    this.postMessage(channel, "pong", { as_user: true });
+  }
+
+  // todo, random aw yiss meme
   _meme (channel, msg) {
     let message = msg || 'Awww yiss, mf\'ing breadcrumbs!';
     this.postMessage(channel, message, { as_user: true });
@@ -288,12 +293,16 @@ export default class Yis extends Bot {
         break;
       case 'config':
         this._config(originalMessage.channel);
-        break;        
-      case 'ping':
-        this._meme(originalMessage.channel, 'pong');
         break;
-      default:
+      case 'ping':
+        this._ping(originalMessage.channel, 'pong');
+        break;
+      case 'meme':
         this._meme(originalMessage.channel);
+      default:
+        this.postMessage(originalMessage.channel
+                       , "Unknown command, try `help`."
+                       , { as_user: true });
         break;
     }
   }
