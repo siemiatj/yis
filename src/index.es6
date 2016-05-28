@@ -131,6 +131,30 @@ export default class Yis extends Bot {
     });
   }
 
+  _userPR (channel, slackUsername) {
+    this.DBConnection.findUser(slackUsername, (res, err) => {
+      if (!res.length || err !== null) {
+        this.postMessage(channel, 'Without your space helmet, Dave? You\'re going to find that rather difficult.', { as_user: true });
+      } else {
+        let user = res[0];
+        let message = '';
+
+        if (user.pull_requests.length) {
+          message = ['You have ', user.pull_requests, ' pull requests: \n'];
+          user.pull_requests.forEach(pr => {
+            message.push(pr, '\n');
+          });
+
+          message.join('');
+        } else {
+          message = 'No pull requests for you this time.';
+        }
+
+        this.postMessage(channel, message, { as_user: true });
+      }
+    });
+  }
+
   _addRepo (channel, slackUsername, repos) {
     let reposString = repos.join(', ');
     let message = `Okay, adding ${reposString} to your reminders.`;
@@ -242,6 +266,7 @@ export default class Yis extends Bot {
     '`yisbot username <github username>`: add or change your GitHub username\n' +
     '`yisbot rm`: remove yourself from bot\'s db\n' +
     '`yisbot me`: check user info currently stored in the db\n' +
+    '`yisbot prs`: check pull requests currently stored in the db for slack user\n' +
     '`yisbot add <repo name> <repo name>`: add a repos to watch for PR\'s and comments\n' +
     '`yisbot remove <repo name> <repo name>`: remove repos you\'ve previously added\n' +
     '`yisbot clear`: clear all repo\'s\n'+
@@ -268,6 +293,9 @@ export default class Yis extends Bot {
         this._me(originalMessage.channel, user.name);
         break;
       }
+      case 'prs':
+        this._userPR(originalMessage.channel, user.name);
+        break;
       case 'add':
         this._addRepo(originalMessage.channel, user.name, parsedCommand);
         break;
