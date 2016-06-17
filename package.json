@@ -16,12 +16,9 @@
   "dependencies": {
     "bluebird": "3.3.5",
     "github4": "1.0.0",
-    "hapi": "13.3.0",
-    "hapi-routes": "2.1.2",
     "moment": "^2.13.0",
     "mongodb": "2.1.16",
     "node-cron": "^1.1.1",
-    "request-promise": "3.0.0",
     "slackbots": "^0.5.1",
     "underscore-node": "^0.1.2"
   },
