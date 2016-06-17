@@ -2,8 +2,8 @@
   "name": "yis",
   "main": "dist/index.js",
   "version": "0.0.1",
-  "author": "Jakub Siemiatkowski <kuba@virtualdesign.pl>",
-  "contributors": "Callum Styan <>",
+  "author": "Jakub Siemiatkowski <kuba@saskla.cz>",
+  "contributors": "Callum Styan <callumstyan@gmail.com>",
   "engines": [
     "node"
   ],
